@@ -1,0 +1,24 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+  background-color: #242424;
+}
+
+.flashCard{
+  padding: 20px;
+  border-radius: 10px;
+  max-width: 1000px;
+  box-shadow: #181717 2px 2px 50px 10px;
+  transition: 0.2s;
+  text-align: center;
+}
+
+.flashCard .flashCard-image{
+  max-width: 10%;
+}
+
+.flashCard:hover{
+  box-shadow: #0f0f0f 2px 2px 50px 10px;
+}
+

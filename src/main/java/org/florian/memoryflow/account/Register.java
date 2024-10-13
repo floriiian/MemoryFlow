@@ -13,10 +13,10 @@ import java.util.regex.Pattern;
 public class Register {
 
     private final Pattern USERNAME_REGEX = Pattern.compile("^[A-Za-z]\\w{5,29}$");
-    final static private Logger LOGGER = LogManager.getLogger();
+    final private Logger LOGGER = LogManager.getLogger();
+    Database db = Database.getInstance();
 
     public void registerAccount(String username, String email, String password) {
-        Database db = Database.getInstance();
         if (username == null || email == null || password == null) {
             return;
         }
@@ -30,9 +30,13 @@ public class Register {
         if (!EmailValidator.getInstance().isValid(email)) {
             return;
         }
-        if (db.getValues("email", "email" , email) == null && db.getValues("username" , "username", username) == null) {
-            db.addAccountToDatabase(username, email, password);
-        }else{
+        if (db.getValue("accounts", "email", "email", email) == null && db.getValue("accounts", "username", "username", username) == null) {
+            db.insertValues(
+                    "accounts",
+                    new String[]{"username", "email", "password"},
+                    new String[]{username, email, password}
+            );
+        } else {
             LOGGER.debug("{} has not been added.", email);
         }
     }

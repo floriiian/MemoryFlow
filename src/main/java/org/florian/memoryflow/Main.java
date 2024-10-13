@@ -6,14 +6,17 @@ import org.apache.logging.log4j.Logger;
 
 import org.florian.memoryflow.account.Login;
 import org.florian.memoryflow.account.Register;
+import org.florian.memoryflow.application.Flashcards;
 import org.florian.memoryflow.db.Database;
 
 public class Main {
 
     final static private Logger LOGGER = LogManager.getLogger();
 
-    //  ADD_ACCOUNT, LOAD_CANVAS, DRAW_PIXEL
-    enum DatabaseQueries {}
+    //  ADD_ACCOUNT
+    enum DatabaseQueries {
+
+    }
 
     public static void main(String[] args) {
         Javalin app = Javalin.create().start(8888);
@@ -24,7 +27,10 @@ public class Main {
 
         Register register = new Register();
         Login login = new Login();
-        register.registerAccount("florin", "florianswzz@gmail.com","W{}mm?YM\\3;29^");
+        Flashcards flashcards = new Flashcards();
+
+        register.registerAccount("florin", "florianswzz@gmail.com", "W{}mm?YM\\3;29^");
         login.loginAccount("florin", "W{}mm?YM\\3;29^");
+        flashcards.getFlashCardsByCategory("1", "Retards");
     }
 }

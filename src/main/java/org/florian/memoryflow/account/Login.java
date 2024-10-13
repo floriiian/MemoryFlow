@@ -30,20 +30,4 @@ public class Login {
             LOGGER.debug("Wrong password for {}", username);
         }
     }
-
-    public void addAccountToDatabase(String username, String email, String password) {
-        Database db = Database.getInstance();
-        db.insertValues(
-                "accounts",
-                new String[]{"username", "email", "password"},
-                new String[]{username, email, BCRYPT.encode(password)}
-        );
-        String user_id = db.getValue("accounts", "user_id", "username", username);
-
-        db.insertValues(
-                "progress",
-                new String[]{"user_id", "streak", "level", "xp"},
-                new String[]{user_id, db.DEFAULT_STREAK, db.DEFAULT_LEVEL, db.DEFAULT_XP}
-        );
-    }
 }

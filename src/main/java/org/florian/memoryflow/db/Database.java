@@ -137,9 +137,9 @@ public class Database {
                     int columnCount = metadata.getColumnCount();
 
                     while (results.next()) {
-                        for (int i = 1; i <= columnCount; i+=2) {
+                        for (int i = 1; i <= columnCount; i += 2) {
                             String question = results.getString(i);
-                            String solution = results.getString(i+1);
+                            String solution = results.getString(i + 1);
                             resultList.put(question, solution);
                         }
                     }
@@ -169,12 +169,11 @@ public class Database {
         executeStatement(value, sql);
     }
 
-    public void insertValues(String table, String[] columns, String[] values) {
+    public Integer insertValues(String table, String[] columns, String[] values) {
         int valueAmount = values.length;
 
         String[] questionMarks = new String[valueAmount];
         Arrays.fill(questionMarks, "?");
-
 
         try {
             String insertSQL = "INSERT INTO " + table + " (" + String.join(",", columns) + ") VALUES (" + String.join(",", questionMarks) + ")";
@@ -185,11 +184,19 @@ public class Database {
                 startingIndex++;
             }
             stmt.executeUpdate();
+
+            Statement getLastID = CONNECTION.createStatement();
+            ResultSet idResult = getLastID.executeQuery("SELECT last_insert_rowid()");
+            if (idResult.next()) {
+                return idResult.getInt(1);
+            }
             stmt.close();
+            getLastID.close();
             LOGGER.debug("{} values have been added to the database.", valueAmount);
         } catch (Exception e) {
             LOGGER.debug(e);
         }
+        return -1;
     }
 
     private void executeStatement(Object value, String sql) {

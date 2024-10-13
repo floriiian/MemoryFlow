@@ -28,8 +28,7 @@ public class Flashcards {
         }
     }
 
-    public void addNewFlashcard(String question, String solution, String category) {
-        String user_id = "1";
+    public void addNewFlashcard(String user_id, String question, String solution, String category) {
 
         db.insertValues(
                 "flashcards",
@@ -38,8 +37,7 @@ public class Flashcards {
         );
     }
 
-    public void removeFlashcard(Integer card_id) {
-        String user_id = "1";
+    public void removeFlashcard(String user_id, Integer card_id) {
         String cardOwner = db.getValue("flashcards", "user_id", "card_id", card_id);
 
         if (!cardOwner.equals(user_id)) {
@@ -50,8 +48,7 @@ public class Flashcards {
         }
     }
 
-    public void updateFlashcard(String card_id, String question, String solution, String category) {
-        String user_id = "1";
+    public void updateFlashcard(String user_id, String card_id, String question, String solution, String category) {
         String cardOwner = db.getValue("flashcards", "user_id", "card_id", card_id);
 
         if (!cardOwner.equals(user_id)) {

@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import '../App.css';
 import {Form, Link} from "react-router-dom";
 
 function Login() {

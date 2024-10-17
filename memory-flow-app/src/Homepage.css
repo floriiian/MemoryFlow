@@ -1,0 +1,11 @@
+* {
+    padding: 0;
+    list-style: none;
+    font-family: 'Poppins', sans-serif;
+    line-height: 1;
+
+}
+body {
+    background-color: #2a2a2f;
+    overflow: hidden;
+}

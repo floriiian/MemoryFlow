@@ -1,25 +1,20 @@
-import { useState } from 'react';
 import {Form, Link} from "react-router-dom";
+import '../Login.css'
 
 function Login() {
-    const [count, setCount] = useState(0);
-
-    const countUp = () => {
-        setCount(count + 1);
-    };
-
     return (
         <>
-            <h1>Login</h1>
-            <p>Login using your MemoryFlow account.</p>
-            <Form>
-                Username <input type="text"/>
+            <div className="login_form">
+                <h1>Login</h1>
+                <Form>
+                    Username <input type="text"/>
+                    <br/>
+                    Password <input type="password"/>
+                </Form>
+                <button>Login</button>
                 <br/>
-                Password <input type="text"/>
-            </Form>
-            <button>Login</button>
-            <br/>
-            <Link to="/">Back to the Homepage</Link>
+                <Link to="/register" style={{margin: "1px", fontSize: "15px"}}>Don't have an account yet?</Link>
+            </div>
         </>
     );
 }

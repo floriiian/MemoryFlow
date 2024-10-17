@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@520&display=swap');
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #1a1c2e;
+    font-family: 'Poppins', serif ;
+}
+
+.login_form {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    width: 300px;
+    position: relative;
+    transform: scale(1.5) translateY(-10%);
+}
+
+.login-form-header{
+    font-size: 20px;
+    margin-bottom: 10px;
+}
+
+.login-form-logo{
+    width: 70px;
+    margin: 0;
+    height: auto;
+}
+
+p{
+    margin: 0 0 20px;
+}
+
+input {
+    color: white !important;
+    caret-color: #95a6ff;
+    height: 33px;
+    font-size: 13px;
+    width: 100%;
+    padding: 7px;
+    margin: 8px 0;
+    border: none;
+    box-shadow: 0 0 0 0.1em #55586f;
+    border-radius: 10px;
+    background: #292a39;
+    box-sizing: border-box;
+}
+
+input:focus {
+    outline: none;
+    box-shadow: 0 0 0 0.1em #95a6ff;
+}
+input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
+    background-color: #292a39 !important;
+    -webkit-box-shadow: 0 0 0 1000px #292a39 inset;
+}
+
+.login-button {
+    width: 100%;
+    padding: 10px 120px;
+    margin: 9px;
+    font-weight: bold;
+    font-size: 12px;
+    background-color: #95a6ff;
+    color: #1a1c2e;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 3px #4d5ed5;
+    cursor: pointer;
+    transition: 0.1s;
+}
+.login-button:hover {
+    background-color: #a4b1fe;
+}
+.login-button:active {
+    border: none;
+    transform: translateY(5%);
+    box-shadow: none;
+}
+
+.redirectLink{
+    font-size: 12px;
+}
+.login-icon {
+    filter: invert(100%) sepia(16%) saturate(7463%) hue-rotate(222deg) brightness(119%) contrast(115%);
+    position: absolute;
+    transform: translateX(-50%);
+    pointer-events: none;
+}
+.icon1 {width: 60%;top: 75%;left: -40%;}
+.icon2 {width: 45%;top: 50%;right: -90%}

@@ -1,9 +1,13 @@
 .sidebar-navigation {
-    display: inline-block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
     min-height: 100vh;
     width: auto;
     background-color: #0a0d16;
-    float: left;
+    max-width: 60px;
     border-radius: 5px;
 }
 .sidebar-navigation ul {
@@ -11,27 +15,24 @@
     color: white;
 }
 .sidebar-navigation ul li {
-    padding: 28px 0;
     cursor: pointer;
-    transition: all ease-out 120ms;
-}
-.sidebar-navigation ul li i {
-    display: block;
-    font-size: 24px;
-    transition: all ease 450ms;
+    transition: all ease-out 100ms;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
 }
 .sidebar-navigation ul li .navbar_tip {
     display: inline-block;
     position: absolute;
-    background-color: #313443;
+    background-color: #374050;
     padding: 8px 15px;
     border-radius: 3px;
-    margin-top: -15px;
+    margin-top: 12px;
+    font-weight: bold;
     left: 70px;
     opacity: 0;
     visibility: hidden;
-    font-size: 13px;
-    letter-spacing: 1px;
+    font-size: 14px;
 }
 .sidebar-navigation ul li .navbar_tip:before {
     content: '';
@@ -62,11 +63,32 @@
 }
 
 .logo{
+    height: 50px;
+    width: 50px;
+    object-fit: contain;
+}
+
+.icon{
     height: 40px;
     width: 40px;
     margin: 10px;
-    pointer-events: none;
     object-fit: contain;
     display: block;
-    scale: 20px;
+}
+
+.separatorContainer{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.logoSeparator{
+    border-radius: 10px;
+    width: 3em;
+    color: #464646;
+}
+
+#accountButton {
+    margin-top: auto; /* This should be sufficient to push it down */
+    background-color: #1b1f2a;
 }

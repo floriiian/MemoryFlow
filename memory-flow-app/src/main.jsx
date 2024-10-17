@@ -6,6 +6,7 @@ import './index.css';
 import Homepage from './routes/Homepage.jsx';
 import Login from './routes/Login.jsx';
 import Navbar from "./Navbar.jsx";
+import Register from "./routes/Register.jsx";
 
 // Define your routes
 const router = createBrowserRouter([
@@ -22,6 +23,10 @@ const router = createBrowserRouter([
     {
         path: "/Login",
         element: <Login/>,
+    },
+    {
+        path: "/Register",
+        element: <Register/>,
     }
 ]);
 

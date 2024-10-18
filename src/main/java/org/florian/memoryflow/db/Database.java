@@ -34,8 +34,7 @@ public class Database {
 
     public void startDatabase() {
         String DATABASE_URL = "jdbc:sqlite:memoryflow.db";
-        String DATABASE_QUERIES = "src/main/java/org/florian/memoryflow/db/sql_queries.ini";
-
+        String DATABASE_QUERIES = "src/main/resources/sql_queries.ini";
         try {
             Class.forName("org.sqlite.JDBC");
             CONNECTION = DriverManager.getConnection(DATABASE_URL);
@@ -151,11 +150,6 @@ public class Database {
             return null;
         }
     }
-
-
-
-
-
 
     /* UPDATERS */
 

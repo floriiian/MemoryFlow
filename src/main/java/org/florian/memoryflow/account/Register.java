@@ -2,6 +2,7 @@ package org.florian.memoryflow.account;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.florian.memoryflow.api.requests.RegisterRequest;
 import org.florian.memoryflow.db.Database;
 
 import org.apache.commons.validator.routines.EmailValidator;
@@ -13,12 +14,17 @@ import java.util.regex.Pattern;
 
 public class Register {
 
-    private final Pattern USERNAME_REGEX = Pattern.compile("^[A-Za-z]\\w{5,29}$");
-    private final BCryptPasswordEncoder BCRYPT = new BCryptPasswordEncoder();
-    final private Logger LOGGER = LogManager.getLogger();
-    Database db = Database.getInstance();
+    private static final Pattern USERNAME_REGEX = Pattern.compile("^[A-Za-z]\\w{5,29}$");
+    private static final BCryptPasswordEncoder BCRYPT = new BCryptPasswordEncoder();
+    static final private Logger LOGGER = LogManager.getLogger();
+    static Database db = Database.getInstance();
 
-    public void registerAccount(String username, String email, String password) {
+
+    public static void handleRequest(RegisterRequest decodedJson){
+        registerAccount(decodedJson.username(), decodedJson.email(), decodedJson.password());
+    }
+
+    public static void registerAccount(String username, String email, String password) {
         if (username == null || email == null || password == null) {
             return;
         }
@@ -43,13 +49,14 @@ public class Register {
                     new String[]{"user_id", "streak", "level", "xp"},
                     new String[]{user_id.toString(), db.DEFAULT_STREAK, db.DEFAULT_LEVEL, db.DEFAULT_XP}
             );
+            LOGGER.debug("{} has been added.", email);
         } else {
             LOGGER.debug("{} has not been added.", email);
         }
     }
 
 
-    private boolean isPasswordValid(String password) {
+    private static boolean isPasswordValid(String password) {
         int passwordLength = password.length();
         if (passwordLength < 10 || passwordLength > 100) {
             return false;

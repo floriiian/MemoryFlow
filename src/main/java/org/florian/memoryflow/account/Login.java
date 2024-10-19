@@ -1,16 +1,19 @@
 package org.florian.memoryflow.account;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import io.javalin.http.Context;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.florian.memoryflow.api.requests.LoginRequest;
+import org.florian.memoryflow.api.responses.LoginResponse;
 import org.florian.memoryflow.db.Database;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
-import java.security.NoSuchAlgorithmException;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,38 +23,66 @@ public class Login {
     static final private Logger LOGGER = LogManager.getLogger();
     private static final BCryptPasswordEncoder BCRYPT = new BCryptPasswordEncoder();
     public static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-    static Database db = Database.getInstance();
+    private static final Database DB = Database.getInstance();
+    private static final Base64.Decoder BASE64_DECODER = Base64.getUrlDecoder();
+    private static final Base64.Encoder BASE64_ENCODER = Base64.getUrlEncoder();
 
-    public static void handleLoginRequest(LoginRequest decodedJson) throws NoSuchAlgorithmException, JsonProcessingException {
-        loginAccount(decodedJson.username(), decodedJson.password());
+    public static void handleLoginRequest(Context ctx, LoginRequest decodedJson) throws JsonProcessingException {
+
+        String username = decodedJson.username();
+        String password = decodedJson.password();
+
+        Object[] loginAttempt = loginAccount(username, password);
+        String status = loginAttempt[0].toString();
+        Boolean success = (Boolean) loginAttempt[1];
+
+        if (success) {
+            String user_id = DB.getValue("accounts", "user_id", "username", username);
+            ctx.cookieStore().set("sessionToken", createWebToken(user_id, 0));
+        }
+        ctx.status(success ? 200 : 500);
+        ctx.result(OBJECT_MAPPER.writeValueAsString(new LoginResponse(status)));
     }
 
-    private static void loginAccount(String username, String password) throws JsonProcessingException {
+    public static boolean validateSessionToken(String sessionToken) {
+
+        try {
+            byte[] payload = BASE64_DECODER.decode(sessionToken.split("\\.")[1]);
+            String decodedPayload = new String(payload, StandardCharsets.UTF_8);
+
+            JsonNode jsonNode = OBJECT_MAPPER.readTree(decodedPayload);
+            String accountID = jsonNode.get("id").asText();
+            int issuedAt = jsonNode.get("iat").asInt();
+
+            return sessionToken.equals(createWebToken(accountID, issuedAt));
+
+        } catch (Exception e) {
+            LOGGER.debug("Error while validating session-token", e);
+            return false;
+        }
+    }
+
+    private static Object[] loginAccount(String username, String password) {
         if (username == null || password == null) {
-            LOGGER.debug("Username and password is null!");
-            return;
+            return new Object[]{"Missing Credentials", false};
         }
-        String hashedPassword = db.getValue("accounts", "password", "username", username);
+        String hashedPassword = DB.getValue("accounts", "password", "username", username);
         if (hashedPassword == null) {
-            return;
+            return new Object[]{"User doesn't exist.", false};
         }
-        if (db.getValue("accounts", "verified", "username", username) == null) {
-            LOGGER.debug("User {} is not verified", username);
-            return;
+        if (DB.getValue("accounts", "verified", "username", username) == null) {
+            return new Object[]{"User isn't verified.", false};
         }
         if (BCRYPT.matches(password, hashedPassword)) {
-            LOGGER.debug("{} logged in.", username);
-            String accountID = db.getValue("accounts", "id", "username", username);
-
-            LOGGER.debug(createWebToken(accountID));
-
+            return new Object[]{"Successful Login", true};
 
         } else {
             LOGGER.debug("Wrong password for {}", username);
+            return new Object[]{"Wrong username or password", false};
         }
     }
 
-    private static String createWebToken(String accountID) throws JsonProcessingException {
+    private static String createWebToken(String accountID, int currentTime) throws JsonProcessingException {
 
         Map<String, String> jsonPayload = new HashMap<>();
         Map<String, String> jsonHeader = new HashMap<>();
@@ -59,7 +90,9 @@ public class Login {
         jsonHeader.put("alg", "HS256");
         jsonHeader.put("typ", "JWT");
 
-        int currentTime = (int) (System.currentTimeMillis() / 1000);
+        if (currentTime == 0) {
+            currentTime = (int) (System.currentTimeMillis() / 1000);
+        }
 
         jsonPayload.put("id", accountID);
         jsonPayload.put("iat", String.valueOf(currentTime));
@@ -70,7 +103,8 @@ public class Login {
         String header = Base64.getUrlEncoder().withoutPadding().encodeToString(
                 OBJECT_MAPPER.writeValueAsString(jsonHeader).getBytes());
 
-        // set jTokenKey="php9FC5S/RZ.~1Z6duA4iMSY2&I8x#h+"
+        // setx jTokenKey "MA4tsJ8WXxf6IxZVbDQvTfk93hJ0pTId"
+
         String secureKey = System.getenv("jTokenKey");
         String signature = generateSignature(header, payload, secureKey);
 
@@ -87,7 +121,7 @@ public class Login {
 
             return Base64.getUrlEncoder().withoutPadding().encodeToString(signatureBytes);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to generate HMAC signature", e);
+            throw new RuntimeException("Failed to generate HMAC signature: ", e);
         }
     }
 }

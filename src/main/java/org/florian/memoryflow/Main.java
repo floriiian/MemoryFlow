@@ -36,23 +36,26 @@ public class Main {
 
     private static void handlePostRequest(String path, Context ctx) throws Exception {
 
+        LOGGER.debug(path);
+
         String requestedData = ctx.body();
         JsonNode jsonData = OBJECT_MAPPER.readTree(requestedData);
 
         String sessionToken = ctx.cookieStore().get("sessionToken");
-
-        if(sessionToken == null && !path.equals("/register")) {
-            return;
-        }
-        else{
-            LOGGER.debug("Registering in user..");
-            Register.handleRequest(OBJECT_MAPPER.treeToValue(jsonData, RegisterRequest.class));
+        if(sessionToken != null && Login.validateSessionToken(sessionToken)){
+            LOGGER.debug("Has a valid token");
+        } else{
+           LOGGER.debug("Invalid session token.");
         }
 
         switch (path) {
-            case "login":
+            case "/login":
                 LOGGER.debug("Logging in user..");
-                Login.handleLoginRequest(OBJECT_MAPPER.treeToValue(jsonData, LoginRequest.class));
+                Login.handleLoginRequest(ctx, OBJECT_MAPPER.treeToValue(jsonData, LoginRequest.class));
+                break;
+            case "/register":
+                LOGGER.debug("Registering in user..");
+                Register.handleRequest(OBJECT_MAPPER.treeToValue(jsonData, RegisterRequest.class));
                 break;
         }
     }

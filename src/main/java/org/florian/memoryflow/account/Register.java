@@ -1,8 +1,13 @@
 package org.florian.memoryflow.account;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.javalin.http.Context;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.florian.memoryflow.api.requests.RegisterRequest;
+import org.florian.memoryflow.api.responses.LoginResponse;
+import org.florian.memoryflow.api.responses.RegisterResponse;
 import org.florian.memoryflow.db.Database;
 
 import org.apache.commons.validator.routines.EmailValidator;
@@ -17,28 +22,38 @@ public class Register {
     private static final Pattern USERNAME_REGEX = Pattern.compile("^[A-Za-z]\\w{5,29}$");
     private static final BCryptPasswordEncoder BCRYPT = new BCryptPasswordEncoder();
     static final private Logger LOGGER = LogManager.getLogger();
+    public static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     static Database db = Database.getInstance();
 
 
-    public static void handleRequest(RegisterRequest decodedJson){
-        registerAccount(decodedJson.username(), decodedJson.email(), decodedJson.password());
+    public static void handleRegisterRequest(Context ctx, RegisterRequest decodedJson) throws JsonProcessingException {
+        Object[] registerAttempt = registerAccount(
+                decodedJson.username(), decodedJson.email(), decodedJson.password()
+        );
+
+        Boolean isSuccess = (Boolean) registerAttempt[0];
+        String status = registerAttempt[1].toString();
+
+        ctx.status(isSuccess ? 200 : 500);
+        ctx.result(OBJECT_MAPPER.writeValueAsString(new RegisterResponse(status)));
     }
 
-    public static void registerAccount(String username, String email, String password) {
+    public static Object[] registerAccount(String username, String email, String password) {
         if (username == null || email == null || password == null) {
-            return;
+            return new Object[]{false, "Invalid Credentials"};
         }
         Matcher m = USERNAME_REGEX.matcher(username);
-        if (!m.matches()) {
-            return;
+        if (!m.matches() || username.length() > 20) {
+            return new Object[]{false, "Invalid Username"};
         }
         if (!isPasswordValid(password)) {
-            return;
+            return new Object[]{false, "Invalid Password"};
         }
         if (!EmailValidator.getInstance().isValid(email)) {
-            return;
+            return new Object[]{false, "Invalid Email Address"};
         }
-        if (db.getValue("accounts", "email", "email", email) == null && db.getValue("accounts", "username", "username", username) == null) {
+        if (db.getValue("accounts", "email", "email", email) == null
+                && db.getValue("accounts", "username", "username", username) == null) {
             Integer user_id = db.insertValues(
                     "accounts",
                     new String[]{"username", "email", "password"},
@@ -49,9 +64,9 @@ public class Register {
                     new String[]{"user_id", "streak", "level", "xp"},
                     new String[]{user_id.toString(), db.DEFAULT_STREAK, db.DEFAULT_LEVEL, db.DEFAULT_XP}
             );
-            LOGGER.debug("{} has been added.", email);
+            return new Object[]{true, "Successfully registered"};
         } else {
-            LOGGER.debug("{} has not been added.", email);
+            return new Object[]{false, "Account already exists."};
         }
     }
 

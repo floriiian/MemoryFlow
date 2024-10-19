@@ -27,6 +27,11 @@ public class Login {
     private static final Base64.Decoder BASE64_DECODER = Base64.getUrlDecoder();
     private static final Base64.Encoder BASE64_ENCODER = Base64.getUrlEncoder();
 
+    final static int HOUR = 3600;
+    final static int REFRESH_TOKEN_LIFETIME = 720;
+    final static int ACCESS_TOKEN_LIFETIME = 900;
+    final static int CURRENT_SECONDS = (int) (System.currentTimeMillis() / 1000);
+
     public static void handleLoginRequest(Context ctx, LoginRequest decodedJson) throws JsonProcessingException {
 
         String username = decodedJson.username();
@@ -38,24 +43,26 @@ public class Login {
 
         if (success) {
             String user_id = DB.getValue("accounts", "user_id", "username", username);
-            ctx.cookieStore().set("sessionToken", createWebToken(user_id, 0));
+            String webToken = createWebToken(user_id, 0);
+            ctx.cookieStore().set("sessionToken", webToken);
+            ctx.cookieStore().set("refreshToken", webToken);
+            DB.updateValues("accounts", "token", "user_id", user_id, webToken);
         }
         ctx.status(success ? 200 : 500);
         ctx.result(OBJECT_MAPPER.writeValueAsString(new LoginResponse(status)));
     }
 
-    public static boolean validateSessionToken(String sessionToken) {
-
+    public static boolean validateSessionToken(String accessToken, String refreshToken, Context ctx) {
         try {
-            byte[] payload = BASE64_DECODER.decode(sessionToken.split("\\.")[1]);
-            String decodedPayload = new String(payload, StandardCharsets.UTF_8);
-
-            JsonNode jsonNode = OBJECT_MAPPER.readTree(decodedPayload);
-            String accountID = jsonNode.get("id").asText();
-            int issuedAt = jsonNode.get("iat").asInt();
-
-            return sessionToken.equals(createWebToken(accountID, issuedAt));
-
+            Object[] refreshTokenData = checkRefreshToken(refreshToken);
+            if (!((boolean) refreshTokenData[0])) {
+                return false;
+            } else if (!checkAccessToken(accessToken)) {
+                ctx.cookieStore().set("sessionToken", createWebToken(accessToken, 0));
+                return true;
+            } else {
+                return true;
+            }
         } catch (Exception e) {
             LOGGER.debug("Error while validating session-token", e);
             return false;
@@ -91,7 +98,7 @@ public class Login {
         jsonHeader.put("typ", "JWT");
 
         if (currentTime == 0) {
-            currentTime = (int) (System.currentTimeMillis() / 1000);
+            currentTime = CURRENT_SECONDS;
         }
 
         jsonPayload.put("id", accountID);
@@ -122,6 +129,51 @@ public class Login {
             return Base64.getUrlEncoder().withoutPadding().encodeToString(signatureBytes);
         } catch (Exception e) {
             throw new RuntimeException("Failed to generate HMAC signature: ", e);
+        }
+    }
+
+    private static Object[] checkRefreshToken(String refreshToken) throws JsonProcessingException {
+        JsonNode refreshTokenJSON = OBJECT_MAPPER.readTree(decodeToken(refreshToken));
+        String refreshTokenAccountID = refreshTokenJSON.get("id").asText();
+        int refreshTokenIssued = refreshTokenJSON.get("iat").asInt();
+
+        if (refreshTokenAccountID == null || refreshTokenIssued == 0) {
+            return new Object[]{false};
+        }
+        if ((refreshTokenIssued / HOUR) + REFRESH_TOKEN_LIFETIME <= (CURRENT_SECONDS / HOUR)) {
+            return new Object[]{false};
+        } else return new Object[]{
+                refreshToken.equals(DB.getValue("accounts", "token", "user_id", refreshTokenAccountID)),
+                refreshTokenAccountID
+        };
+    }
+
+    private static boolean checkAccessToken(String accessToken) throws JsonProcessingException {
+        String decodedJson = decodeToken(accessToken);
+        if (decodedJson == null) {
+            return false;
+        } else {
+            JsonNode accessTokenJSON = OBJECT_MAPPER.readTree(decodedJson);
+            String accessTokenAccountID = accessTokenJSON.get("id").asText();
+            int accessTokenIssued = accessTokenJSON.get("iat").asInt();
+
+            if (accessTokenAccountID == null || accessTokenIssued == 0) {
+                return false;
+
+            } else if (ACCESS_TOKEN_LIFETIME <= CURRENT_SECONDS) {
+                return false;
+            } else {
+                return accessToken.equals(createWebToken(accessTokenAccountID, accessTokenIssued));
+            }
+        }
+    }
+
+    private static String decodeToken(String token) {
+        try {
+            byte[] tokenPayload = BASE64_DECODER.decode(token.split("\\.")[1]);
+            return new String(tokenPayload, StandardCharsets.UTF_8);
+        } catch (Exception e) {
+            return null;
         }
     }
 }

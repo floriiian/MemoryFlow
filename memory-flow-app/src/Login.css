@@ -1,4 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@520&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
 
 body {
     display: flex;
@@ -7,7 +8,11 @@ body {
     min-height: 100vh;
     margin: 0;
     background-color: #1a1c2e;
-    font-family: 'Poppins', serif ;
+    font-family: 'Poppins-500', sans-serif; ;
+}
+
+.login-container{
+    position: sticky;
 }
 
 .login_form {
@@ -19,10 +24,13 @@ body {
     width: 300px;
     position: relative;
     transform: scale(1.5) translateY(-10%);
+    font-weight: 400;
+    animation: scaleUpForm 0.3s ease forwards;
 }
 
 .login-form-header{
     font-size: 20px;
+    margin-top: 0;
     margin-bottom: 10px;
 }
 
@@ -30,14 +38,15 @@ body {
     width: 70px;
     margin: 0;
     height: auto;
+    animation: brainBreathe 3s ease;
+    animation-iteration-count: infinite;
 }
 
 p{
     margin: 0 0 20px;
 }
 
-input {
-    color: white !important;
+.login-input  {
     caret-color: #95a6ff;
     height: 33px;
     font-size: 13px;
@@ -51,19 +60,27 @@ input {
     box-sizing: border-box;
 }
 
-input:focus {
+.login-input:focus {
     outline: none;
     box-shadow: 0 0 0 0.1em #95a6ff;
 }
-input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
+.login-input:focus ~ .input-placeholder{
+    top: 1.2em;
+    font-size: 9px;
+}
+.login-input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
     background-color: #292a39 !important;
     -webkit-box-shadow: 0 0 0 1000px #292a39 inset;
 }
-
+.login-input.false{
+    background-color: #40000a !important;
+    box-shadow: 0 0 0 0.1em #cc0000;
+}
 .login-button {
     width: 100%;
     padding: 10px 120px;
-    margin: 9px;
+    margin-top: 9px;
+    margin-bottom: 9px;
     font-weight: bold;
     font-size: 12px;
     background-color: #95a6ff;
@@ -84,13 +101,55 @@ input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
 }
 
 .redirectLink{
-    font-size: 12px;
+    padding: 10px;
+    font-size: 11px;
+    font-weight: bold;
 }
+
+.login-icon-container {
+    display: flex;
+    position: relative;
+    transform: scale(1.5);
+    bottom: 7em;
+    z-index: 10;
+}
+
 .login-icon {
     filter: invert(100%) sepia(16%) saturate(7463%) hue-rotate(222deg) brightness(119%) contrast(115%);
     position: absolute;
-    transform: translateX(-50%);
+    transform: translateX(-50%) scale(1);
     pointer-events: none;
 }
-.icon1 {width: 60%;top: 75%;left: -40%;}
-.icon2 {width: 45%;top: 50%;right: -90%}
+.icon1 {
+    width: 60%;
+    top: 75%;
+    left: -40%;
+}
+.icon2 {
+    width: 45%;
+    top: 50%;
+    right: -90%;
+}
+
+@keyframes scaleUpForm{
+    0% {
+        transform:  scale(1.4);
+    }
+    50%{
+        transform: scale(1.51);
+    }
+    100% {
+        transform: scale(1.5);
+    }
+}
+@keyframes brainBreathe {
+    0% {
+        filter: brightness(1);
+    }
+    50%{
+        filter: brightness(1.9);
+    }
+    100% {
+        filter: brightness(1);
+    }
+}

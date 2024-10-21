@@ -2,6 +2,7 @@ import {useState} from 'react';
 import {Form, Link, useNavigate} from "react-router-dom";
 import {postRequest} from '../api/requests.jsx';
 import {showFormHint, hideFormHint, setFormHint} from "../handlers/hintHandlers.jsx";
+import {checkCredentials} from "../handlers/registerHandler.jsx";
 
 import darkLogo from '../assets/dark_logo.png';
 import bookIcon from '../assets/login-icons/book.png';
@@ -39,42 +40,49 @@ function Register() {
         hideFormHint(togglePasswordHint);
         hideFormHint(toggleServerHint);
 
-        postRequest("register", {
-            "username": formData.username,
-            "email": formData.email,
-            "password": formData.password
-        })
-            .then(response => {
-                console.log("Success Response:", response);
-                navigate("/login");
+        const credentialsResult = checkCredentials(formData.username, formData.email, formData.password );
+        let result = credentialsResult;
+
+        if (credentialsResult === "valid") {
+
+            postRequest("register", {
+                "username": formData.username,
+                "email": formData.email,
+                "password": formData.password
             })
-            .catch(error => {
-                console.error("Error Status Code:", error.status);
-                console.error("Error Message:", error.message);
+                .then(response => {
+                    console.log("Success Response:", response);
+                    navigate("/login");
+                })
+                .catch(error => {
+                    console.error("Error Status Code:", error.status);
+                    console.error("Error Message:", error.message);
 
-                const errorMessage = error.message;
-                const lowerCaseErrorMessage = errorMessage.toLowerCase();
+                    result = error.message;
+                });
+        }
 
-                if (lowerCaseErrorMessage.includes("username")) {
-                    setFormHint(setUsernameHint, errorMessage);
-                    showFormHint(toggleUsernameHint);
-                } else if (lowerCaseErrorMessage.includes("email")) {
-                    setFormHint(setEmailHint, errorMessage);
-                    showFormHint(toggleEmailHint);
-                } else if (lowerCaseErrorMessage.includes("password")) {
-                    setFormHint(setPasswordHint, errorMessage);
-                    showFormHint(togglePasswordHint);
-                } else if (lowerCaseErrorMessage.includes("credentials")) {
-                    setFormHint(setServerHint, "Umm. Seems like you're missing a field.");
-                    showFormHint(toggleServerHint); // Corrected here
-                } else if (lowerCaseErrorMessage.includes("already exists")) {
-                    setFormHint(setServerHint, "This email or username is already in use.");
-                    showFormHint(toggleServerHint);
-                } else {
-                    setFormHint(setServerHint, "Oops! There was an issue on our side, try again.");
-                    showFormHint(toggleServerHint);
-                }
-            });
+        const lowerCaseResult = result.toLowerCase();
+
+        if (lowerCaseResult.includes("username")) {
+            setFormHint(setUsernameHint, result);
+            showFormHint(toggleUsernameHint);
+        } else if (lowerCaseResult.includes("email")) {
+            setFormHint(setEmailHint, result);
+            showFormHint(toggleEmailHint);
+        } else if (lowerCaseResult.includes("password")) {
+            setFormHint(setPasswordHint, result);
+            showFormHint(togglePasswordHint);
+        } else if (lowerCaseResult.includes("credentials")) {
+            setFormHint(setServerHint, result);
+            showFormHint(toggleServerHint);
+        } else if (lowerCaseResult.includes("already exists")) {
+            setFormHint(setServerHint, result);
+            showFormHint(toggleServerHint);
+        } else {
+            setFormHint(setServerHint, result);
+            showFormHint(toggleServerHint);
+        }
     };
 
     const handleFormChange = (e) => {

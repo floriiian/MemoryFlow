@@ -100,6 +100,20 @@ p{
     box-shadow: none;
 }
 
+
+.inputHint{
+    font-size: 0.7em;
+    margin: 0;
+    padding: 0;
+    color: #eb3754;
+    font-weight: bold;
+}
+.inputHint img{
+    width: 8px;
+    margin-right: 3px
+}
+
+
 .redirectLink{
     padding: 10px;
     font-size: 11px;
@@ -121,14 +135,14 @@ p{
     pointer-events: none;
 }
 .icon1 {
-    width: 60%;
+    width: 90%;
     top: 75%;
-    left: -40%;
+    left: -67%;
 }
 .icon2 {
-    width: 45%;
+    width: 65%;
     top: 50%;
-    right: -90%;
+    right: -120%;
 }
 
 @keyframes scaleUpForm{
@@ -136,10 +150,10 @@ p{
         transform:  scale(1.4);
     }
     50%{
-        transform: scale(1.51);
+        transform: scale(1.81);
     }
     100% {
-        transform: scale(1.5);
+        transform: scale(1.8);
     }
 }
 @keyframes brainBreathe {

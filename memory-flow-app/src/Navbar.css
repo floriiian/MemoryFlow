@@ -3,30 +3,33 @@
     top: 0;
     left: 0;
     display: flex;
-    flex-direction: column;
     min-height: 100vh;
     width: auto;
-    background-color: #0a0d16;
-    max-width: 60px;
+    min-width: 15.5em;
+    max-width: 15.5em;
     border-radius: 5px;
+    border-right: 3px solid #625c5c;
 }
 .sidebar-navigation ul {
     text-align: center;
-    color: white;
+    color: #c3d4de;
 }
 .sidebar-navigation ul li {
+    margin-left: 0.9em;
     cursor: pointer;
     transition: all ease-out 100ms;
     align-items: center;
     justify-content: center;
     overflow: hidden;
+    display: flex;
+    margin-bottom: 0.3em;
 }
 .sidebar-navigation ul li .navbar_tip {
     display: inline-block;
     position: absolute;
     background-color: #374050;
     padding: 8px 15px;
-    border-radius: 3px;
+    border-radius: 10px;
     margin-top: 12px;
     font-weight: bold;
     left: 70px;
@@ -46,49 +49,59 @@
     background-color: inherit;
 }
 .sidebar-navigation ul li:hover {
-    background-color: #374050;
-    border-radius: 5px;
+    background-color: rgba(55, 64, 80, 0.48);
+    border-radius: 10px;
 }
 .sidebar-navigation ul li:hover .navbar_tip {
     visibility: visible;
     opacity: 1;
 }
 .sidebar-navigation ul li.active {
-    border-radius: 5px;
-    background-color: #374050;
+    border-radius: 10px;
+    box-shadow: 0 0 0 2px #4d5ed5;
+}
 
-}
-.sidebar-navigation ul li.active i {
-    color: #98d7ec;
-}
 
 .logo{
     height: 50px;
     width: 50px;
-    object-fit: contain;
 }
 
-.icon{
-    height: 40px;
-    width: 40px;
-    margin: 10px;
-    object-fit: contain;
-    display: block;
-}
-
-.separatorContainer{
+.icon {
+    text-transform: uppercase;
+    font-weight: bold;
+    height: 35px;
+    width: 200px;
+    padding: 8px;
     display: flex;
     align-items: center;
-    justify-content: center;
+    gap: 10px;
+    font-size: 0.95em;
 }
 
-.logoSeparator{
-    border-radius: 10px;
-    width: 3em;
-    color: #464646;
+.icon img{
+    height: 50px;
+    width: 50px;
 }
 
-#accountButton {
-    margin-top: auto; /* This should be sufficient to push it down */
-    background-color: #1b1f2a;
+.titleLogo{
+    font-weight: bold;
+    margin: 0.7em 0.7em 15px;
+    font-size: 1.6em;
+    animation: logoBreathe 6s ease;
+    animation-iteration-count: infinite;
+}
+
+
+
+@keyframes logoBreathe {
+    0% {
+        filter: brightness(1.2);
+    }
+    50% {
+        filter: brightness(0.8);
+    }
+    100% {
+        filter: brightness(1.2);
+    }
 }

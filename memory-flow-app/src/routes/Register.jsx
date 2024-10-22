@@ -1,8 +1,7 @@
 import {useState} from 'react';
 import {Form, Link, useNavigate} from "react-router-dom";
 import {postRequest} from '../api/requests.jsx';
-import {showFormHint, hideFormHint, setFormHint} from "../handlers/hintHandlers.jsx";
-import {checkCredentials} from "../handlers/registerHandler.jsx";
+import {checkCredentials, hideFormHint, setFormHint, showFormHint} from "../handlers/accountHandlers.jsx";
 
 import darkLogo from '../assets/dark_logo.png';
 import bookIcon from '../assets/login-icons/book.png';
@@ -40,7 +39,7 @@ function Register() {
         hideFormHint(togglePasswordHint);
         hideFormHint(toggleServerHint);
 
-        const credentialsResult = checkCredentials(formData.username, formData.email, formData.password );
+        const credentialsResult = checkCredentials(formData.username, formData.email, formData.password);
         let result = credentialsResult;
 
         if (credentialsResult === "valid") {
@@ -57,11 +56,16 @@ function Register() {
                 .catch(error => {
                     console.error("Error Status Code:", error.status);
                     console.error("Error Message:", error.message);
-
                     result = error.message;
-                });
-        }
 
+                    displayResults(result)
+                });
+        } else {
+            displayResults(result)
+        }
+    };
+
+    function displayResults(result) {
         const lowerCaseResult = result.toLowerCase();
 
         if (lowerCaseResult.includes("username")) {
@@ -83,7 +87,7 @@ function Register() {
             setFormHint(setServerHint, result);
             showFormHint(toggleServerHint);
         }
-    };
+    }
 
     const handleFormChange = (e) => {
         const {name, value} = e.target;
@@ -101,6 +105,7 @@ function Register() {
                         type="text" name={"username"} value={formData.username}
                         placeholder={"Username"}
                         onChange={handleFormChange}
+                        autoComplete={"true"}
                     />
                     <div
                         style={{opacity: usernameHintToggled ? 1 : 0, height: usernameHintToggled ? "auto" : "0",}}
@@ -113,7 +118,7 @@ function Register() {
                         type="email" name={"email"} value={formData.email}
                         placeholder={"Email"}
                         onChange={handleFormChange}
-
+                        autoComplete={"true"}
                     />
                     <div
                         style={{opacity: emailHintToggled ? 1 : 0, height: emailHintToggled ? "auto" : "0",}}
@@ -126,6 +131,7 @@ function Register() {
                         type="password" name={"password"} value={formData.password}
                         placeholder={"Password"}
                         onChange={handleFormChange}
+                        autoComplete={"false"}
                     />
                     <div
                         style={{opacity: passwordHintToggled ? 1 : 0, height: passwordHintToggled ? "auto" : "0",}}

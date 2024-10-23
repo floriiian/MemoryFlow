@@ -1,14 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
-
-body {
+.loginBody {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
     margin: 0;
     background-color: #1a1c2e;
-    font-family: 'Poppins-500', sans-serif;;
+    font-family: 'Poppins-500', sans-serif;
+    color: white;
+    ::placeholder {
+        color: #eeeeee;
+        opacity: 1;
+    }
+    input {
+        color: #eeeeee;
+    }
+    top: 0;left: 0;right: 0;bottom: 0;
+    position: absolute;
+
 }
 
 .login-container {
@@ -25,7 +35,9 @@ body {
     position: relative;
     transform: scale(1.5) translateY(-10%);
     font-weight: 400;
-    animation: scaleUpForm 0.3s ease forwards;
+    animation: pageReveal 0.5s ease;
+
+
 }
 
 .login-form-header {
@@ -157,7 +169,7 @@ p {
 }
 
 .resetLink:hover::before {
-    bottom: 0px;
+    bottom: 0;
     height: 50%;
 }
 
@@ -188,18 +200,6 @@ p {
     right: -120%;
 }
 
-@keyframes scaleUpForm {
-    0% {
-        transform: scale(1.4);
-    }
-    50% {
-        transform: scale(1.81);
-    }
-    100% {
-        transform: scale(1.8);
-    }
-}
-
 @keyframes brainBreathe {
     0% {
         filter: brightness(1);
@@ -209,5 +209,14 @@ p {
     }
     100% {
         filter: brightness(1);
+    }
+}
+
+@keyframes pageReveal {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
     }
 }

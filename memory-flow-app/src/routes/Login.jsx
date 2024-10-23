@@ -10,7 +10,6 @@ import hintIcon from '../assets/hint_icon.png';
 
 import '../Login.css'
 
-
 function Login() {
 
     const [formData, setFormData] = useState({
@@ -100,6 +99,7 @@ function Login() {
 
     return (
         <>
+            <div className={"loginBody"}>
             <div className={"login-container"}>
                 <div className="login_form">
                     <img className="login-form-logo" alt="MemoryBoost Logo" src={darkLogo}/>
@@ -145,6 +145,7 @@ function Login() {
                 <div className="login-icon-container">
                     <img className="login-icon icon1" src={bookIcon} alt="Book Logo"/>
                     <img className="login-icon icon2" src={chemistryIcon} alt="Chemistry Logo"/>
+                </div>
                 </div>
             </div>
         </>

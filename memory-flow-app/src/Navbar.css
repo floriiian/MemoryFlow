@@ -61,7 +61,6 @@
     box-shadow: 0 0 0 2px #4d5ed5;
 }
 
-
 .logo{
     height: 50px;
     width: 50px;
@@ -86,7 +85,7 @@
 
 .titleLogo{
     font-weight: bold;
-    margin: 0.7em 0.7em 15px;
+    margin: 0.7em 0.7em 29px;
     font-size: 1.6em;
     animation: logoBreathe 6s ease;
     animation-iteration-count: infinite;

@@ -7,15 +7,20 @@ import Homepage from './routes/Homepage.jsx';
 import Login from './routes/Login.jsx';
 import Navbar from "./Navbar.jsx";
 import Register from "./routes/Register.jsx";
+import MyCards from "./routes/MyCards.jsx";
 
 // Define your routes
 const router = createBrowserRouter([
     {
         path: "/",
         element: <Homepage />,
+    },
+    {
+        path: "/my_cards",
+        element: <MyCards/>,
         children: [
             {
-                path: "/",
+                path: "/my_cards",
                 element: <Navbar/>,
             }
         ]

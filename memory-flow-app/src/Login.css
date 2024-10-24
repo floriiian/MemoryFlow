@@ -35,7 +35,7 @@
     position: relative;
     transform: scale(1.5) translateY(-10%);
     font-weight: 400;
-    animation: pageReveal 0.5s ease;
+    animation: pageReveal 0.2s;
 
 
 }
@@ -99,17 +99,17 @@ p {
     margin-bottom: 9px;
     font-weight: bold;
     font-size: 12px;
-    background-color: #95a6ff;
-    color: #1a1c2e;
+    background-color: #647eff;
+    color: #fbfbfb;
     border: none;
     border-radius: 10px;
-    box-shadow: 0 3px #4d5ed5;
+    box-shadow: 0 0.3em #394aa3;
     cursor: pointer;
     transition: 0.1s;
 }
 
 .login-button:hover {
-    background-color: #a4b1fe;
+    background-color: #7b8df9;
 }
 
 .login-button:active {
@@ -199,6 +199,36 @@ p {
     top: 50%;
     right: -120%;
 }
+
+.close {
+    position: fixed;
+    left: 32px;
+    top: 32px;
+    width: 32px;
+    height: 32px;
+    opacity: 0.8;
+}
+.close:hover {
+    cursor: pointer;
+    opacity: 1;
+}
+.close:before, .close:after {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    content: ' ';
+    height: 25px;
+    width: 2px;
+    background-color: #6d6d6d;
+    transform-origin: center;
+}
+.close:before {
+    transform: translate(-50%, -50%) rotate(45deg); /* Adjusted to center */
+}
+.close:after {
+    transform: translate(-50%, -50%) rotate(-45deg); /* Adjusted to center */
+}
+
 
 @keyframes brainBreathe {
     0% {

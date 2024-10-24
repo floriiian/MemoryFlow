@@ -17,10 +17,12 @@ function Homepage() {
                 <div className="start_container">
                     <img src={cardsStack} alt="CardStack"/>
                     <div className="text_and_buttons">
-                        <span>The smart, fun, and effective way of learning!</span>
+                        <span>The easy, fun,and <span className="underlined_text">effective </span>way of learning!</span>
                         <div className="start_container_btns">
-                            <button onClick={() => navigate("/register")} className="customButton register"><span>Get started</span></button>
-                            <button onClick={() => navigate("/login")} className="customButton login"><span>I already have an account</span></button>
+                        <button onClick={() => navigate("/register")} className="customButton register"><span>Get started</span>
+                            </button>
+                            <button onClick={() => navigate("/login")} className="customButton login"><span>I already have an account</span>
+                            </button>
                         </div>
                     </div>
                 </div>

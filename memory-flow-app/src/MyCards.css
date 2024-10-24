@@ -1,0 +1,20 @@
+.flashcardsContainer {
+    position: fixed;
+    left: 50em%; /* Start from the center */
+    transform: translateX(-50%); /* Move it back by half of its width */
+    color: white;
+}
+
+.header-line {
+    position: fixed;
+    top: 2em;
+    left: 23em; /* Center it horizontally */
+    transform: translateX(-50%); /* Shift back by 50% of the element's width */
+    font-size: 2em;
+    width: 30em; /* Keep the width or adjust as needed */
+    color: #a3a3a3;
+    background-color: transparent;
+    padding-bottom: 30px;
+    border-bottom: 3px solid #ff0000;
+    text-align: center; /* Center the text within the header line */
+}

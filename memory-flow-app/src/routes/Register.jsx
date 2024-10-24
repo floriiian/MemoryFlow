@@ -1,5 +1,5 @@
 import {useState} from 'react';
-import {Form, Link, useNavigate} from "react-router-dom";
+import {Form, Link, redirect, useNavigate} from "react-router-dom";
 import {postRequest} from '../api/requests.jsx';
 import {checkCredentials, hideFormHint, setFormHint, showFormHint} from "../handlers/accountHandlers.jsx";
 
@@ -97,6 +97,7 @@ function Register() {
     return (
         <>
             <div className={"loginBody"}>
+                <a className="close" onClick={() => navigate("/")}></a>
                 <div className="login_form">
                     <img className="login-form-logo" alt="MemoryBoost Logo" src={darkLogo}/>
                     <h1 className="login-form-header">Join MemoryFlow</h1>

@@ -1,16 +1,21 @@
 import {Outlet} from "react-router-dom";
-import '../Homepage.css';
+import '../index.css'
+import '../MyCards.css'
+
 
 function MyCards() {
 
     return (
         <>
-            <Outlet/>
-            <h1>Your flashcards</h1>
-            <p>Flashcard</p>
-            <p>Flashcard</p>
-            <p>Flashcard</p>
-            <p>Flashcard</p>
+            <div className={"baseBody"}>
+                <div className={"header-line"}>
+                    <span>Your flashcards</span>
+                </div>
+                <div className={"flashcardsContainer"}>
+                    <span>Flashcard</span>
+                </div>
+                <Outlet/>
+            </div>
         </>
     );
 }

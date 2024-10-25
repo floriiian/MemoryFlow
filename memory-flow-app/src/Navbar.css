@@ -11,7 +11,7 @@
 }
 .sidebar-navigation ul {
     text-align: center;
-    color: #c3d4de;
+    color: #c9c9c9;
 }
 .sidebar-navigation ul li {
     margin-left: 0.9em;
@@ -75,14 +75,188 @@
 }
 
 .icon img{
-    height: 50px;
-    width: 50px;
+    height: 28px;
+    width: 28px;
+    margin-right: 0.2em;
 }
 
 .titleLogo{
     font-weight: bold;
     margin: 0.7em 0.7em 29px;
     font-size: 1.6em;
-    color: #ffffff;
+    color: #88b9ff;
 }
 
+.progress-bar-navigation {
+    position: absolute;
+    right: 2em;
+    top: 1em;
+    display: flex;
+    min-height: 100vh;
+    min-width: 20.5em;
+    max-width: 15.5em;
+}
+
+.progress-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1em;
+    background-color: transparent;
+    height: 3em;
+    margin-left: 3em;
+}
+
+.progress-display {
+    display: flex;
+    align-items: center;
+    column-gap: 10px;
+}
+.progress-text{
+    color: #615b5b;
+    font-weight: bold;
+    font-size: 1.6em;
+    display: flex;
+}
+
+.progress-text.level{
+    color: #f5b74f;
+}
+
+.progress-img{
+    height: 32px;
+    margin-right: 0.1em;
+}
+
+.dailyGoal{
+    left: -3.5em;
+    top: 4em;
+    position: absolute;
+    display: flex;
+    border: #615b5b 3px solid;
+    border-radius: 20px;
+    width: 23.2em;
+    height: 11em;
+    margin: 1em;
+    flex-direction: column;
+    pointer-events: none;
+}
+.daily-goal-header{
+    color: #c7c7bf;
+    font-size: 1.4em;
+    margin-left: 1em;
+    font-weight: bold;
+    transform: translateY(1em);
+}
+
+.daily-goal-text{
+    color: #c7c7bf;
+    font-size: 1.2em;
+    margin-left: 4.5em;
+    font-weight: bold;
+    transform: translateY(3.2em);
+}
+
+.dailyGoal img{
+    color: #c7c7bf;
+    margin-top: 3.6em;
+    font-size: 1.2em;
+    width: 4em;
+    position: absolute;
+}
+.goal-progress-bar {
+    font-weight: bold;
+    color: #b4b4b4;
+    top: 7.5em;
+    transform: translateX(5em);
+    position: absolute;
+    background-color: #615b5b;
+    border-radius: 10px;
+    width: 16em;
+    height: 1.3em;
+    text-align: center;
+    z-index: 1; /* Layer beneath span */
+    display: flex;
+    align-items: center; /* Center the span vertically */
+}
+
+.inner-goal-progress-bar {
+    position: absolute;
+    background-color: #5976a6;
+    border-radius: 10px;
+    z-index: 2;
+    color: #b4b4b4;
+    top: 7.5em;
+    transform: translateX(5em);
+    width: 6em;
+    height: 1.3em;
+    text-align: center;
+    display: flex;
+    align-items: center;
+}
+.process-bar-text{
+    position: absolute;
+    border-radius: 10px;
+    z-index: 2;
+    color: #b4b4b4;
+    top: 7.5em;
+    transform: translateX(12em);
+    height: 1.3em;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    font-weight: bold;
+}
+
+
+.leaderBoard {
+    left: -3.5em;
+    top: 17em;
+    position: absolute;
+    display: flex;
+    flex-direction: column; /* Stack elements vertically */
+    border: #615b5b 3px solid;
+    border-radius: 20px;
+    width: 23.2em;
+    height: 30em;
+    margin: 1em;
+    text-align: center;
+    pointer-events: auto; /* Enable interactivity if needed */
+}
+
+.leaderboard-header,
+.leaderboard-text {
+    color: #c7c7bf;
+    font-weight: bold;
+    margin: 0.5em 0;
+}
+
+.leaderboard-header {
+    font-size: 1.8em;
+}
+
+.leaderboard-text {
+    font-size: 1.2em;
+    transform: translateY(0.4em);
+}
+
+/* Leaderboard user styling */
+.leaderboard-user {
+    color: #c7c7bf;
+    font-size: 1.2em;
+    display: flex;
+    align-items: center;
+    gap: 0.4em;
+    padding: 0.5em 0; /* Spacing between users */
+    width: 100%; /* Full width of container */
+    justify-content: center;
+}
+
+.leaderboard-user span,
+.leaderboard-user img {
+    font-weight: bold;
+}
+
+.leaderboard-user img {
+    width: 1em;
+}

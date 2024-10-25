@@ -7,6 +7,7 @@
     min-height: 100vh;
     margin: 0;
     background-color: #1a1c2e;
+
     font-family: 'Poppins-500', sans-serif;
     color: white;
     ::placeholder {
@@ -38,6 +39,7 @@
     animation: pageReveal 0.2s;
 
 
+
 }
 
 .login-form-header {
@@ -54,9 +56,6 @@
     animation-iteration-count: infinite;
 }
 
-p {
-    margin: 0 0 20px;
-}
 
 .login-input {
     caret-color: #95a6ff;
@@ -173,31 +172,36 @@ p {
     height: 50%;
 }
 
-.login-icon-container {
-    display: flex;
-    position: relative;
-    transform: scale(1.5);
-    bottom: 7em;
-    z-index: 10;
-}
-
 .login-icon {
     filter: invert(100%) sepia(16%) saturate(7463%) hue-rotate(222deg) brightness(119%) contrast(115%);
     position: absolute;
-    transform: translateX(-50%) scale(1);
+    display: flex;
+    transform: translateX(-50%) scale(0.8);
     pointer-events: none;
 }
 
-.icon1 {
-    width: 90%;
-    top: 75%;
-    left: -67%;
+.login-icon.icon1.login{
+    width: 120%;
+    top: 30%;
+    left: -69%;
 }
 
-.icon2 {
-    width: 65%;
-    top: 50%;
-    right: -120%;
+.login-icon.icon2.login{
+    width: 90%;
+    top: 30%;
+    right: -155%;
+}
+
+.login-icon.icon1.register{
+    width: 80%;
+    top: 48%;
+    left: -29%;
+}
+
+.login-icon.icon2.register{
+    width: 60%;
+    top: 48%;
+    right: -87%;
 }
 
 .close {
@@ -223,10 +227,10 @@ p {
     transform-origin: center;
 }
 .close:before {
-    transform: translate(-50%, -50%) rotate(45deg); /* Adjusted to center */
+    transform: translate(-50%, -50%) rotate(45deg);
 }
 .close:after {
-    transform: translate(-50%, -50%) rotate(-45deg); /* Adjusted to center */
+    transform: translate(-50%, -50%) rotate(-45deg);
 }
 
 

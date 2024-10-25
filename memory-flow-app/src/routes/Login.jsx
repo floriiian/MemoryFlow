@@ -148,10 +148,9 @@ function Login() {
                         </div>
                         <Link to="/register" className={"redirectLink"}>Don't have an account yet?</Link>
                     </div>
-
                     <div className="login-icon-container">
-                        <img className="login-icon icon1" src={bookIcon} alt="Book Logo"/>
-                        <img className="login-icon icon2" src={chemistryIcon} alt="Chemistry Logo"/>
+                        <img className="login-icon icon1 login" src={bookIcon} alt="Book Logo"/>
+                        <img className="login-icon icon2 login" src={chemistryIcon} alt="Chemistry Logo"/>
                     </div>
                 </div>
             </div>

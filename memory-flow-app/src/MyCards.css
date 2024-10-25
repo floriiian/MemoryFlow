@@ -1,20 +1,31 @@
 .flashcardsContainer {
     position: fixed;
-    left: 50em%; /* Start from the center */
-    transform: translateX(-50%); /* Move it back by half of its width */
+    left: 50%;
+    transform: translateX(-50%);
     color: white;
+    text-align: center;
 }
 
-.header-line {
-    position: fixed;
-    top: 2em;
-    left: 23em; /* Center it horizontally */
-    transform: translateX(-50%); /* Shift back by 50% of the element's width */
-    font-size: 2em;
-    width: 30em; /* Keep the width or adjust as needed */
-    color: #a3a3a3;
-    background-color: transparent;
-    padding-bottom: 30px;
-    border-bottom: 3px solid #ff0000;
-    text-align: center; /* Center the text within the header line */
+.flashcard {
+    background: rgb(37, 39, 64);
+    box-shadow: 0 5px #12131f;
+    margin-top: 0.7em;
+    width: 20em;
+    height: 8em;
+    border-radius: 10px;
+    padding: 20px;
+}
+
+.inner-flashcard {
+    border-radius: 10px;
+    width: 15em;
+    padding: 0.8em;
+    max-width: 15em;
+    text-align: left;
+}
+
+.inner-flashcard p {
+    color: #aaaaaa;
+    font-size: 20px;
+    font-weight: bold;
 }

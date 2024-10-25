@@ -98,63 +98,70 @@ function Register() {
         <>
             <div className={"loginBody"}>
                 <a className="close" onClick={() => navigate("/")}></a>
-                <div className="login_form">
-                    <img className="login-form-logo" alt="MemoryBoost Logo" src={darkLogo}/>
-                    <h1 className="login-form-header">Join MemoryFlow</h1>
-                    <Form onSubmit={handleSubmit}>
-                        <input
-                            className={usernameHintToggled ? "login-input name false" : "login-input name"}
-                            type="text" name={"username"} value={formData.username}
-                            placeholder={"Username"}
-                            onChange={handleFormChange}
-                            autoComplete={"true"}
-                        />
-                        <div
-                            style={{opacity: usernameHintToggled ? 1 : 0, height: usernameHintToggled ? "auto" : "0",}}
-                            className={"inputHint username"}>
-                            <img alt="Hinting Icon" src={hintIcon}/>
-                            {usernameHintText}
+                <div className={"login-container"}>
+                    <div className="login_form">
+                        <img className="login-form-logo" alt="MemoryBoost Logo" src={darkLogo}/>
+                        <h1 className="login-form-header">Join MemoryFlow</h1>
+                        <Form onSubmit={handleSubmit}>
+                            <input
+                                className={usernameHintToggled ? "login-input name false" : "login-input name"}
+                                type="text" name={"username"} value={formData.username}
+                                placeholder={"Username"}
+                                onChange={handleFormChange}
+                                autoComplete={"true"}
+                            />
+                            <div
+                                style={{
+                                    opacity: usernameHintToggled ? 1 : 0,
+                                    height: usernameHintToggled ? "auto" : "0",
+                                }}
+                                className={"inputHint username"}>
+                                <img alt="Hinting Icon" src={hintIcon}/>
+                                {usernameHintText}
+                            </div>
+                            <input
+                                className={emailHintToggled ? "login-input email false" : "login-input email"}
+                                type="email" name={"email"} value={formData.email}
+                                placeholder={"Email"}
+                                onChange={handleFormChange}
+                                autoComplete={"true"}
+                            />
+                            <div
+                                style={{opacity: emailHintToggled ? 1 : 0, height: emailHintToggled ? "auto" : "0",}}
+                                className={"inputHint email"}>
+                                <img alt="Hinting Icon" src={hintIcon}/>
+                                {emailHintText}
+                            </div>
+                            <input
+                                className={passwordHintToggled ? "login-input password false" : "login-input password"}
+                                type="password" name={"password"} value={formData.password}
+                                placeholder={"Password"}
+                                onChange={handleFormChange}
+                                autoComplete={"false"}
+                            />
+                            <div
+                                style={{
+                                    opacity: passwordHintToggled ? 1 : 0,
+                                    height: passwordHintToggled ? "auto" : "0",
+                                }}
+                                className={"inputHint password"}>
+                                <img alt="Hinting Icon" src={hintIcon}/>
+                                {passwordHintText}
+                            </div>
+                            <button type="submit" className="login-button">Register</button>
+                            <div
+                                style={{opacity: serverHintToggled ? 1 : 0, height: serverHintToggled ? "auto" : "0",}}
+                                className={"inputHint"}>
+                                <img alt="Hinting Icon" src={hintIcon}/>
+                                {serverHintText}
+                            </div>
+                        </Form>
+                        <Link to="/login" className="redirectLink">Already have an account?</Link>
+                        <div className="login-icon-container">
+                            <img className="login-icon icon1 register" src={bookIcon} alt="Book Logo"/>
+                            <img className="login-icon icon2 register" src={chemistryIcon} alt="Chemistry Logo"/>
                         </div>
-                        <input
-                            className={emailHintToggled ? "login-input email false" : "login-input email"}
-                            type="email" name={"email"} value={formData.email}
-                            placeholder={"Email"}
-                            onChange={handleFormChange}
-                            autoComplete={"true"}
-                        />
-                        <div
-                            style={{opacity: emailHintToggled ? 1 : 0, height: emailHintToggled ? "auto" : "0",}}
-                            className={"inputHint email"}>
-                            <img alt="Hinting Icon" src={hintIcon}/>
-                            {emailHintText}
-                        </div>
-                        <input
-                            className={passwordHintToggled ? "login-input password false" : "login-input password"}
-                            type="password" name={"password"} value={formData.password}
-                            placeholder={"Password"}
-                            onChange={handleFormChange}
-                            autoComplete={"false"}
-                        />
-                        <div
-                            style={{opacity: passwordHintToggled ? 1 : 0, height: passwordHintToggled ? "auto" : "0",}}
-                            className={"inputHint password"}>
-                            <img alt="Hinting Icon" src={hintIcon}/>
-                            {passwordHintText}
-                        </div>
-                        <button type="submit" className="login-button">Register</button>
-                        <div
-                            style={{opacity: serverHintToggled ? 1 : 0, height: serverHintToggled ? "auto" : "0",}}
-                            className={"inputHint"}>
-                            <img alt="Hinting Icon" src={hintIcon}/>
-                            {serverHintText}
-                        </div>
-                    </Form>
-                    <Link to="/login" className="redirectLink">Already have an account?</Link>
-                </div>
-
-                <div className="login-icon-container">
-                    <img className="login-icon icon1" src={bookIcon} alt="Book Logo"/>
-                    <img className="login-icon icon2" src={chemistryIcon} alt="Chemistry Logo"/>
+                    </div>
                 </div>
             </div>
         </>

@@ -9,7 +9,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 
+import org.apache.logging.log4j.spi.LoggerRegistry;
 import org.ini4j.Ini;
+import org.jetbrains.annotations.Nullable;
 
 
 public class Database {
@@ -89,32 +91,52 @@ public class Database {
         }
     }
 
+    public ArrayList<String> getUserData(String userID) throws SQLException {
+        String sql = "SELECT accounts.username, progress.streak, progress.level, progress.xp" +
+                "FROM accounts" +
+                "JOIN progress ON accounts.username = progress.username" +
+                "WHERE accounts.username = ?";
+        try (PreparedStatement preparedStmt = CONNECTION.prepareStatement(sql)) {
+            preparedStmt.setString(1, userID);
+
+            return getStrings(preparedStmt);
+        } catch (Exception e) {
+            LOGGER.debug(e);
+        }
+        return null;
+    }
+
+    @Nullable
+    private ArrayList<String> getStrings(PreparedStatement preparedStmt) throws SQLException {
+        try (ResultSet results = preparedStmt.executeQuery()) {
+            if (!results.next()) {
+                return null;
+            } else {
+                ArrayList<String> resultList = new ArrayList<>();
+                ResultSetMetaData metadata = results.getMetaData();
+                int columnCount = metadata.getColumnCount();
+
+                while (results.next()) {
+                    StringBuilder row = new StringBuilder();
+                    for (int i = 1; i <= columnCount; i++) {
+                        String resultString = results.getString(i);
+                        if (!resultList.contains(resultString)) {
+                            row.append(resultString);
+                            resultList.add(row.toString());
+                        }
+                    }
+                }
+                return resultList;
+            }
+        }
+    }
+
     public ArrayList<String> getAllValuesByType(String table, String column, String where, Object value) {
         String sql = "SELECT " + column + " FROM " + table + " WHERE " + where + " = ?";
 
         try (PreparedStatement preparedStmt = CONNECTION.prepareStatement(sql)) {
             preparedStmt.setString(1, (String) value);
-            try (ResultSet results = preparedStmt.executeQuery()) {
-                if (!results.next()) {
-                    return null;
-                } else {
-                    ArrayList<String> resultList = new ArrayList<>();
-                    ResultSetMetaData metadata = results.getMetaData();
-                    int columnCount = metadata.getColumnCount();
-
-                    while (results.next()) {
-                        StringBuilder row = new StringBuilder();
-                        for (int i = 1; i <= columnCount; i++) {
-                            String resultString = results.getString(i);
-                            if (!resultList.contains(resultString)) {
-                                row.append(resultString);
-                                resultList.add(row.toString());
-                            }
-                        }
-                    }
-                    return resultList;
-                }
-            }
+            return getStrings(preparedStmt);
         } catch (Exception e) {
             LOGGER.debug(e);
             return null;

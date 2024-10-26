@@ -22,10 +22,9 @@ public class Login {
 
     static final private Logger LOGGER = LogManager.getLogger();
     private static final BCryptPasswordEncoder BCRYPT = new BCryptPasswordEncoder();
-    public static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final Database DB = Database.getInstance();
     private static final Base64.Decoder BASE64_DECODER = Base64.getUrlDecoder();
-    private static final Base64.Encoder BASE64_ENCODER = Base64.getUrlEncoder();
 
     final static int HOUR = 3600;
     final static int REFRESH_TOKEN_LIFETIME = 720;
@@ -49,6 +48,7 @@ public class Login {
             DB.updateValues("accounts", "token", "user_id", user_id, webToken);
         }
         ctx.status(success ? 200 : 500);
+        ctx.contentType("application/json");
         ctx.result(OBJECT_MAPPER.writeValueAsString(new LoginResponse(status)));
     }
 
@@ -174,6 +174,16 @@ public class Login {
             return new String(tokenPayload, StandardCharsets.UTF_8);
         } catch (Exception e) {
             return null;
+        }
+    }
+
+    public static String getAccountIDByToken(String token) throws Exception {
+        String decodedJson = decodeToken(token);
+        if (decodedJson == null) {
+            return null;
+        } else {
+            JsonNode accessTokenJSON = OBJECT_MAPPER.readTree(decodedJson);
+            return accessTokenJSON.get("id").asText();
         }
     }
 }

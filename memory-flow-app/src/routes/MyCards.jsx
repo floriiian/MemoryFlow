@@ -10,12 +10,14 @@ function MyCards() {
         <>
             <div className={"baseBody"}>
                 <div className={"flashcardsContainer"}>
-                    <div className={"flashcard"}>
+
+                    {/*
+                                        <div className={"flashcard"}>
                         <div className={"inner-flashcard"}>
                         <p>Category: History</p>
                         <p>Questions: 30</p>
                     </div>
-                </div>
+                </div>*/}
             </div>
             <main>
                 <Outlet/>

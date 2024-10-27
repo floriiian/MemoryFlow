@@ -42,7 +42,6 @@ public class Main {
 
 
     private static void handleGetRequest(String path, Context ctx) throws Exception {
-
         boolean isValidSession = verifySession(ctx);
         if (!isValidSession) {
             ctx.status(500);
@@ -53,7 +52,7 @@ public class Main {
 
             // TODO: THIS IS RESPONSIBLE TO MANAGE USER DATA REQUESTS:
 
-            switch(path) {
+            switch (path) {
                 case "/get/userdata":
                     UserData.handleUserDataRequest(ctx);
                     break;
@@ -78,16 +77,19 @@ public class Main {
 
     private static boolean verifySession(Context ctx) {
 
-        String accessToken = ctx.cookieStore().get("sessionToken");
-        String refreshToken = ctx.cookieStore().get("refreshToken");
+        String accessToken = ctx.cookie("sessionToken");
+        String refreshToken = ctx.cookie("refreshToken");
+
+        LOGGER.debug(accessToken);
+        LOGGER.debug(refreshToken);
+
 
         if (accessToken == null || refreshToken == null || !Login.validateSessionToken(accessToken, refreshToken, ctx)) {
             ctx.removeCookie("sessionToken");
             ctx.removeCookie("refreshToken");
             return false;
-        } else {
-            return true;
         }
+        return true;
     }
 
     private static void handleLogin(boolean isLoggedIn, JsonNode jsonData, Context ctx, RequestType requestType) {

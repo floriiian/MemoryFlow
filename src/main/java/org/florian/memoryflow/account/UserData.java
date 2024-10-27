@@ -17,7 +17,7 @@ public class UserData {
 
     public static void handleUserDataRequest(Context ctx) {
         try {
-            String accountId = Login.getAccountIDByToken(ctx.cookieStore().get("sessionToken"));
+            String accountId = Login.getAccountIDByToken(ctx.cookie("sessionToken"));
             ArrayList<String> userData = DATABASE.getUserData(accountId);
 
             boolean success = false;
@@ -35,7 +35,7 @@ public class UserData {
 
 
         } catch (Exception e) {
-            LOGGER.debug("Error trying to handle user-data request.");
+            LOGGER.debug("Error trying to handle user-data request." + e);
         }
     }
 }

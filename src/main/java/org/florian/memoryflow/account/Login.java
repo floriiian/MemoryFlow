@@ -1,5 +1,7 @@
 package org.florian.memoryflow.account;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -43,8 +45,8 @@ public class Login {
         if (success) {
             String user_id = DB.getValue("accounts", "user_id", "username", username);
             String webToken = createWebToken(user_id, 0);
-            ctx.cookieStore().set("sessionToken", webToken);
-            ctx.cookieStore().set("refreshToken", webToken);
+            ctx.cookie("sessionToken", webToken);
+            ctx.cookie("refreshToken", webToken);
             DB.updateValues("accounts", "token", "user_id", user_id, webToken);
         }
         ctx.status(success ? 200 : 500);
@@ -58,7 +60,8 @@ public class Login {
             if (!((boolean) refreshTokenData[0])) {
                 return false;
             } else if (!checkAccessToken(accessToken)) {
-                ctx.cookieStore().set("sessionToken", createWebToken(accessToken, 0));
+                ctx.removeCookie("sessionToken");
+                ctx.cookie("sessionToken", createWebToken(accessToken, 0));
                 return true;
             } else {
                 return true;
@@ -89,9 +92,9 @@ public class Login {
         }
     }
 
-    private static String createWebToken(String accountID, int currentTime) throws JsonProcessingException {
+    public static String createWebToken(String accountID, int currentTime) throws JsonProcessingException {
 
-        Map<String, String> jsonPayload = new HashMap<>();
+        Map<String, Object> jsonPayload = new HashMap<>();
         Map<String, String> jsonHeader = new HashMap<>();
 
         jsonHeader.put("alg", "HS256");
@@ -102,15 +105,13 @@ public class Login {
         }
 
         jsonPayload.put("id", accountID);
-        jsonPayload.put("iat", String.valueOf(currentTime));
+        jsonPayload.put("iat", currentTime);
 
-        String payload = Base64.getUrlEncoder().withoutPadding().encodeToString(
-                OBJECT_MAPPER.writeValueAsString(jsonPayload).getBytes());
+        String payload = Base64.getUrlEncoder().withoutPadding()
+                .encodeToString(OBJECT_MAPPER.writeValueAsString(jsonPayload).getBytes());
 
-        String header = Base64.getUrlEncoder().withoutPadding().encodeToString(
-                OBJECT_MAPPER.writeValueAsString(jsonHeader).getBytes());
-
-        // setx jTokenKey "MA4tsJ8WXxf6IxZVbDQvTfk93hJ0pTId"
+        String header = Base64.getUrlEncoder().withoutPadding()
+                .encodeToString(OBJECT_MAPPER.writeValueAsString(jsonHeader).getBytes());
 
         String secureKey = System.getenv("jTokenKey");
         String signature = generateSignature(header, payload, secureKey);
@@ -121,14 +122,13 @@ public class Login {
     private static String generateSignature(String header, String payload, String secret) {
         try {
             String data = header + "." + payload;
-            Mac hmacSHA256 = Mac.getInstance("HmacSHA256");   // MAC = MessageAuthenticationCode
-            SecretKeySpec secretKeySpec = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
-            hmacSHA256.init(secretKeySpec);
-            byte[] signatureBytes = hmacSHA256.doFinal(data.getBytes());
-
-            return Base64.getUrlEncoder().withoutPadding().encodeToString(signatureBytes);
+            SecretKeySpec signingKey = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
+            Mac mac = Mac.getInstance("HmacSHA256");
+            mac.init(signingKey);
+            byte[] rawSignature = mac.doFinal(data.getBytes());
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(rawSignature);
         } catch (Exception e) {
-            throw new RuntimeException("Failed to generate HMAC signature: ", e);
+            throw new RuntimeException("Failed to generate JWT signature", e);
         }
     }
 
@@ -160,7 +160,7 @@ public class Login {
             if (accessTokenAccountID == null || accessTokenIssued == 0) {
                 return false;
 
-            } else if (ACCESS_TOKEN_LIFETIME <= CURRENT_SECONDS) {
+            } else if (accessTokenIssued + ACCESS_TOKEN_LIFETIME <= CURRENT_SECONDS) {
                 return false;
             } else {
                 return accessToken.equals(createWebToken(accessTokenAccountID, accessTokenIssued));
@@ -178,12 +178,8 @@ public class Login {
     }
 
     public static String getAccountIDByToken(String token) throws Exception {
-        String decodedJson = decodeToken(token);
-        if (decodedJson == null) {
-            return null;
-        } else {
-            JsonNode accessTokenJSON = OBJECT_MAPPER.readTree(decodedJson);
-            return accessTokenJSON.get("id").asText();
-        }
+
+        DecodedJWT jwt = JWT.decode(token);
+        return jwt.getClaim("id").asString();
     }
 }

@@ -92,21 +92,19 @@ public class Database {
     }
 
     public ArrayList<String> getUserData(String userID) throws SQLException {
-        String sql = "SELECT accounts.username, progress.streak, progress.level, progress.xp" +
-                "FROM accounts" +
-                "JOIN progress ON accounts.username = progress.username" +
-                "WHERE accounts.username = ?";
+        String sql = "SELECT accounts.username, progress.streak, progress.level, progress.xp " +
+                "FROM accounts " +
+                "JOIN progress ON accounts.user_id = progress.user_id " +
+                "WHERE accounts.user_id = ?";
         try (PreparedStatement preparedStmt = CONNECTION.prepareStatement(sql)) {
             preparedStmt.setString(1, userID);
-
             return getStrings(preparedStmt);
         } catch (Exception e) {
             LOGGER.debug(e);
+            return null;
         }
-        return null;
     }
 
-    @Nullable
     private ArrayList<String> getStrings(PreparedStatement preparedStmt) throws SQLException {
         try (ResultSet results = preparedStmt.executeQuery()) {
             if (!results.next()) {
@@ -115,17 +113,12 @@ public class Database {
                 ArrayList<String> resultList = new ArrayList<>();
                 ResultSetMetaData metadata = results.getMetaData();
                 int columnCount = metadata.getColumnCount();
-
-                while (results.next()) {
-                    StringBuilder row = new StringBuilder();
+                do {
                     for (int i = 1; i <= columnCount; i++) {
                         String resultString = results.getString(i);
-                        if (!resultList.contains(resultString)) {
-                            row.append(resultString);
-                            resultList.add(row.toString());
-                        }
+                        resultList.add(resultString);
                     }
-                }
+                } while (results.next());
                 return resultList;
             }
         }

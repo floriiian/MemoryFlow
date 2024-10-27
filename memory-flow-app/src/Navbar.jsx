@@ -9,9 +9,10 @@ import deadStreakIcon from './assets/progression-icons/dead_streak_icon.png';
 import aliveStreakIcon from './assets/progression-icons/streak_icon.png';
 import levelIcon from './assets/progression-icons/level_icon.png';
 import goalIcon from './assets/progression-icons/goal_icon.png';
-import LeaderBoardUser from "./components/LeaderBoardUser.jsx";
 import React from 'react';
-import ReactDOM from 'react-dom/client'; // Make sure this is 'react-dom/client'
+import ReactDOM from 'react-dom/client';
+import LeaderboardUser from "./components/LeaderboardUser.jsx";
+import {getRequest} from "./api/Requests.jsx";
 
 function Navbar() {
 
@@ -31,6 +32,8 @@ function Navbar() {
         }
     }
 
+    let username = ""
+
     const [dailyGoalPercentage, setDailyGoalPercentage] = useState("10em");
     const [dailyGoalText, setDailyGoalText] = useState("0/0");
     const [dailyGoalDescription, setDailyGoalDescription] = useState("Blow your brains out");
@@ -38,15 +41,42 @@ function Navbar() {
     const [levelText, setLevelText] = useState("1");
     const [streakText, setStreakText] = useState("0");
 
+
+    function getUserdata() {
+        return getRequest("get/userdata")
+            .then(response => {
+                return response;
+            })
+            .catch(error => {
+                console.error("Error Status Code:", error.status);
+                console.error("Error Message:", error.message);
+                throw new Error(error.message);
+            });
+    }
+
     window.onload = () => {
-        const leaderBoardElement = document.querySelector('.leaderboard-scrollable');
-        const root = ReactDOM.createRoot(leaderBoardElement);
-        const user1 = <LeaderBoardUser place="1" username="Florian" xp="410"/>;
-        root.render(user1);
+
+        getUserdata().then((response) => {
+
+            setLevelText(response.level);
+            setStreakText(response.streak);
+            username = response.username;
+
+            let currUsr = "florian1234";
+            let currUsr2 = "florian12234";
+
+            const leaderboardElement = ReactDOM.createRoot(document.querySelector('.leaderboard-scrollable'));
+            const users = [
+                <LeaderboardUser key="1" place="1" username={currUsr} xp="410" highlight={username === currUsr} />,
+                <LeaderboardUser key="2" place="2" username={currUsr2} xp="410" highlight={username === currUsr2} />
+            ];
+
+            leaderboardElement.render(users);
+        })
+
     };
 
     return (
-
         <>
             <div className={"baseBody"}>
                 <nav className="sidebar-navigation">

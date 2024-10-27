@@ -37,9 +37,14 @@
     transform: scale(1.5) translateY(-10%);
     font-weight: 400;
     animation: pageReveal 0.2s;
+}
 
-
-
+input:-webkit-autofill,
+input:-webkit-autofill:focus {
+    transition: background-color 600000s 0s, color 600000s 0s;
+}
+input[data-autocompleted] {
+    background-color: transparent !important;
 }
 
 .login-form-header {
@@ -61,6 +66,7 @@
     caret-color: #95a6ff;
     height: 33px;
     font-size: 13px;
+    color: white;
     width: 100%;
     padding: 7px;
     margin: 8px 0;
@@ -71,7 +77,10 @@
     box-sizing: border-box;
 }
 
+
+
 .login-input:focus {
+    color: white;
     outline: none;
     box-shadow: 0 0 0 0.1em #95a6ff;
 }

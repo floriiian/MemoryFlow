@@ -1,6 +1,6 @@
 import {useState} from 'react';
 import {Form, Link, redirect, useNavigate} from "react-router-dom";
-import {postRequest} from '../api/requests.jsx';
+import {postRequest} from '../api/Requests.jsx';
 import {checkCredentials, hideFormHint, setFormHint, showFormHint} from "../handlers/accountHandlers.jsx";
 
 import darkLogo from '../assets/dark_logo.png';
@@ -108,7 +108,7 @@ function Register() {
                                 type="text" name={"username"} value={formData.username}
                                 placeholder={"Username"}
                                 onChange={handleFormChange}
-                                autoComplete={"true"}
+                                autoComplete={"one-time-code"}
                             />
                             <div
                                 style={{
@@ -124,7 +124,7 @@ function Register() {
                                 type="email" name={"email"} value={formData.email}
                                 placeholder={"Email"}
                                 onChange={handleFormChange}
-                                autoComplete={"true"}
+                                autoComplete={"one-time-code"}
                             />
                             <div
                                 style={{opacity: emailHintToggled ? 1 : 0, height: emailHintToggled ? "auto" : "0",}}
@@ -137,7 +137,7 @@ function Register() {
                                 type="password" name={"password"} value={formData.password}
                                 placeholder={"Password"}
                                 onChange={handleFormChange}
-                                autoComplete={"false"}
+                                autoComplete={"one-time-code"}
                             />
                             <div
                                 style={{

@@ -270,6 +270,12 @@
     border-top: 1px solid #605a5a;
 }
 
+.leaderboard-user.highlighted{
+    background-color: #434d64;
+    border-bottom: 1px solid #5c74b1;
+    border-top: 1px solid #5c74b1;
+}
+
 
 
 .leaderboard-scrollable{

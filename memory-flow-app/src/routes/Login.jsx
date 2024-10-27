@@ -1,7 +1,7 @@
 import {Form, Link, useNavigate} from "react-router-dom";
 import {useState} from "react";
 import {checkCredentials, hideFormHint, setFormHint, showFormHint} from "../handlers/accountHandlers.jsx";
-import {postRequest} from "../api/requests.jsx";
+import {postRequest} from "../api/Requests.jsx";
 
 import bookIcon from "../assets/login-icons/book.png";
 import chemistryIcon from "../assets/login-icons/chemistry.png";
@@ -110,7 +110,7 @@ function Login() {
                                 className={usernameHintToggled ? "login-input name false" : "login-input name"}
                                 type="text" name={"username"} value={formData.username}
                                 placeholder={"Username"}
-                                autoComplete={"true"}
+                                autoComplete={"one-time-code"}
                                 onChange={handleFormChange}
                             />
                             <div
@@ -126,7 +126,7 @@ function Login() {
                                 className={passwordHintToggled ? "login-input password false" : "login-input password"}
                                 type="password" name={"password"} value={formData.password}
                                 placeholder={"Password"}
-                                autoComplete={"false"}
+                                autoComplete={"one-time-code"}
                                 onChange={handleFormChange}
                             />
                             <div

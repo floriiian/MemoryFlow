@@ -54,6 +54,18 @@ function Navbar() {
             });
     }
 
+    function getLeaderboardData() {
+        return getRequest("get/leaderboard")
+            .then(response => {
+                return response;
+            })
+            .catch(error => {
+                console.error("Error Status Code:", error.status);
+                console.error("Error Message:", error.message);
+                throw new Error(error.message);
+            });
+    }
+
     window.onload = () => {
 
         getUserdata().then((response) => {
@@ -61,19 +73,28 @@ function Navbar() {
             setLevelText(response.level);
             setStreakText(response.streak);
             username = response.username;
-
-            let currUsr = "florian1234";
-            let currUsr2 = "florian12234";
-
-            const leaderboardElement = ReactDOM.createRoot(document.querySelector('.leaderboard-scrollable'));
-            const users = [
-                <LeaderboardUser key="1" place="1" username={currUsr} xp="410" highlight={username === currUsr} />,
-                <LeaderboardUser key="2" place="2" username={currUsr2} xp="410" highlight={username === currUsr2} />
-            ];
-
-            leaderboardElement.render(users);
         })
 
+        getLeaderboardData().then((response) => {
+            const users = [];
+            const competitors = response["competitors"];
+            const leaderboardElement = ReactDOM.createRoot(document.querySelector('.leaderboard-scrollable'));
+
+            for (let i = 0; i < competitors.length; i++) {
+                let competitor = competitors[i];
+                let competitorElement = (
+                    <LeaderboardUser
+                        key={competitor["rank"]}
+                        place={competitor["rank"]}
+                        username={competitor["username"]}
+                        xp={competitor["daily_xp"]}
+                        highlight={username === competitor["username"]}
+                    />
+                );
+                users.push(competitorElement);
+            }
+            leaderboardElement.render(<>{users}</>);
+        });
     };
 
     return (

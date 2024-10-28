@@ -258,7 +258,7 @@
 
 .leaderboard-user {
     color: #c7c7bf;
-    font-size: 1.5em;
+    font-size: 1.3em;
     display: flex;
     align-items: center;
     gap: 0.5em;
@@ -280,6 +280,14 @@
 
 .leaderboard-scrollable{
     overflow-y: scroll;
+}
+.leaderboard-scrollable::-webkit-scrollbar {
+    display: none;
+}
+
+.leaderboard-scrollable {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
 }
 
 .leaderboard-user span,

@@ -1,6 +1,5 @@
 package org.florian.memoryflow;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.Javalin;
@@ -16,15 +15,24 @@ import org.florian.memoryflow.api.requests.RegisterRequest;
 import org.florian.memoryflow.api.responses.RegisterResponse;
 import org.florian.memoryflow.api.responses.UserdataResponse;
 import org.florian.memoryflow.db.Database;
+import org.florian.memoryflow.leaderboard.Leaderboard;
+
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 public class Main {
 
-    enum RequestType {
+    enum PostRequestType {
         LOGIN, REGISTER, LOGOUT
     }
 
     final static private Logger LOGGER = LogManager.getLogger();
     public static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     public static void main(String[] args) {
 
@@ -33,11 +41,14 @@ public class Main {
 
         db.startDatabase();
 
+        final ScheduledFuture<?> leaderboardHandler = scheduler.scheduleAtFixedRate(
+                Leaderboard.getTopTenCompetitors, 0, 60, SECONDS);
+
         app.post("/register", ctx -> handlePostRequest("/register", ctx));
         app.post("/login", ctx -> handlePostRequest("/login", ctx));
 
         app.get("/get/userdata", ctx -> handleGetRequest("/get/userdata", ctx));
-
+        app.get("/get/leaderboard", ctx -> handleGetRequest("/get/leaderboard", ctx));
     }
 
 
@@ -49,12 +60,12 @@ public class Main {
             ctx.result(OBJECT_MAPPER.writeValueAsString(
                     new UserdataResponse(null, null, null, null)));
         } else {
-
-            // TODO: THIS IS RESPONSIBLE TO MANAGE USER DATA REQUESTS:
-
             switch (path) {
                 case "/get/userdata":
                     UserData.handleUserDataRequest(ctx);
+                    break;
+                case "/get/leaderboard":
+                    Leaderboard.handleLeaderboardRequest(ctx);
                     break;
             }
         }
@@ -67,10 +78,10 @@ public class Main {
 
         switch (path) {
             case "/login":
-                handleLogin(isValidSession, jsonData, ctx, RequestType.LOGIN);
+                handleLogin(isValidSession, jsonData, ctx, PostRequestType.LOGIN);
                 break;
             case "/register":
-                handleLogin(isValidSession, jsonData, ctx, RequestType.REGISTER);
+                handleLogin(isValidSession, jsonData, ctx, PostRequestType.REGISTER);
                 break;
         }
     }
@@ -92,7 +103,7 @@ public class Main {
         return true;
     }
 
-    private static void handleLogin(boolean isLoggedIn, JsonNode jsonData, Context ctx, RequestType requestType) {
+    private static void handleLogin(boolean isLoggedIn, JsonNode jsonData, Context ctx, PostRequestType requestType) {
         try {
             if (isLoggedIn) {
                 ctx.status(500);

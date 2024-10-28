@@ -5,18 +5,24 @@ import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.*;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
-import org.apache.logging.log4j.spi.LoggerRegistry;
 import org.ini4j.Ini;
-import org.jetbrains.annotations.Nullable;
+
+import static java.util.concurrent.TimeUnit.SECONDS;
 
 
 public class Database {
 
     private static Database instance;
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
 
     private Database() {
     }
@@ -45,7 +51,8 @@ public class Database {
             String[] availableTables = new String[]{
                     "create_account_table",
                     "create_flashcard_table",
-                    "create_progress_table"
+                    "create_progress_table",
+                    "create_leaderboard_table"
             };
 
             for (String table : availableTables) {
@@ -58,11 +65,38 @@ public class Database {
                     LOGGER.debug(e);
                 }
             }
-            LOGGER.debug("{} tables have been created.", availableTables.length);
+            LOGGER.debug("{} tables have been initialized.", availableTables.length);
+
+            long initialDelay = getNextLeaderboardReset();
+            final ScheduledFuture<?> leaderboardHandler = scheduler.scheduleAtFixedRate(
+                    resetLeaderboard, initialDelay, TimeUnit.DAYS.toSeconds(1), SECONDS);
+
+            LOGGER.debug("Next leaderboard reset in: {} seconds." ,initialDelay);
+
         } catch (Exception e) {
             LOGGER.error(e);
         }
     }
+
+    /* AUTOMATION */
+
+    final long getNextLeaderboardReset() {
+        LocalDateTime startOfNextDay = LocalDate.now().plusDays(1).atStartOfDay();
+        long startOfNextDaySeconds = startOfNextDay.atZone(ZoneId.systemDefault()).toEpochSecond();
+        return startOfNextDaySeconds - (System.currentTimeMillis() / 1000);
+    }
+
+    final Runnable resetLeaderboard = () -> {
+        try {
+            PreparedStatement preparedStmt = CONNECTION.prepareStatement("TRUNCATE TABLE leaderboard");
+            preparedStmt.executeUpdate();
+            preparedStmt.close();
+            LOGGER.debug("Successfully reset leaderboard table.");
+        } catch (Exception e) {
+            LOGGER.debug(e);
+        }
+    };
+
 
     /* GETTERS */
 
@@ -124,6 +158,17 @@ public class Database {
         }
     }
 
+    public ArrayList<String> getAllValuesFromTable(String table) {
+        String sql = "SELECT * FROM " + table;
+        try (PreparedStatement preparedStmt = CONNECTION.prepareStatement(sql)) {
+            return getStrings(preparedStmt);
+        } catch (Exception e) {
+            LOGGER.debug(e);
+            return null;
+        }
+    }
+
+
     public ArrayList<String> getAllValuesByType(String table, String column, String where, Object value) {
         String sql = "SELECT " + column + " FROM " + table + " WHERE " + where + " = ?";
 
@@ -171,6 +216,17 @@ public class Database {
     public void updateValues(String table, String column, String where, String whereValue, Object value) {
         String sql = "UPDATE " + table + " SET " + column + " = ? WHERE " + where + "=" + whereValue;
         executeStatement(value, sql);
+    }
+
+    public void updateIncrementedValue(String table, String column, String where, String whereValue, int value) {
+        String sql = "UPDATE " + table + " SET " + column + " = " + column + " + ? WHERE " + where + " = ?";
+        try (PreparedStatement stmt = CONNECTION.prepareStatement(sql)) {
+            stmt.setInt(1, value);
+            stmt.setString(2, whereValue);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.debug(e);
+        }
     }
 
     public void deleteValue(String table, String where, Object value) {
@@ -226,5 +282,6 @@ public class Database {
         } catch (Exception e) {
             LOGGER.debug(e);
         }
+
     }
 }

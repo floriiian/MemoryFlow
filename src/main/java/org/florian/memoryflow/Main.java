@@ -12,6 +12,7 @@ import org.florian.memoryflow.account.Register;
 import org.florian.memoryflow.account.UserData;
 import org.florian.memoryflow.api.requests.LoginRequest;
 import org.florian.memoryflow.api.requests.RegisterRequest;
+import org.florian.memoryflow.api.responses.ErrorResponse;
 import org.florian.memoryflow.api.responses.RegisterResponse;
 import org.florian.memoryflow.api.responses.UserdataResponse;
 import org.florian.memoryflow.db.Database;
@@ -49,6 +50,7 @@ public class Main {
 
         app.get("/get/userdata", ctx -> handleGetRequest("/get/userdata", ctx));
         app.get("/get/leaderboard", ctx -> handleGetRequest("/get/leaderboard", ctx));
+
     }
 
 
@@ -58,7 +60,7 @@ public class Main {
             ctx.status(500);
             ctx.contentType("application/json");
             ctx.result(OBJECT_MAPPER.writeValueAsString(
-                    new UserdataResponse(null, null, null, null)));
+                    new ErrorResponse("Not logged in.")));
         } else {
             switch (path) {
                 case "/get/userdata":
@@ -90,10 +92,6 @@ public class Main {
 
         String accessToken = ctx.cookie("sessionToken");
         String refreshToken = ctx.cookie("refreshToken");
-
-        LOGGER.debug(accessToken);
-        LOGGER.debug(refreshToken);
-
 
         if (accessToken == null || refreshToken == null || !Login.validateSessionToken(accessToken, refreshToken, ctx)) {
             ctx.removeCookie("sessionToken");

@@ -37,9 +37,38 @@ function Navbar() {
     const [dailyGoalPercentage, setDailyGoalPercentage] = useState("10em");
     const [dailyGoalText, setDailyGoalText] = useState("0/0");
     const [dailyGoalDescription, setDailyGoalDescription] = useState("Blow your brains out");
+    const [leaderboardTime, setLeaderboardTime] = useState("00h 00m 00s");
 
     const [levelText, setLevelText] = useState("1");
     const [streakText, setStreakText] = useState("0");
+
+    function midnightTime() {
+        const midnight = new Date();
+        midnight.setHours(24);
+        midnight.setMinutes(0);
+        midnight.setSeconds(0);
+        midnight.setMilliseconds(0);
+        return midnight.getTime();
+    }
+
+    const x = setInterval(function() {
+
+        let countDownDate = midnightTime();
+        let now = new Date().getTime();
+        let distance = countDownDate - now;
+
+        let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        setLeaderboardTime(+ hours + "h "
+            + minutes + "m " + seconds + "s ")
+
+        if (distance < 0) {
+            clearInterval(x);
+            setLeaderboardTime("Reset")
+        }
+    }, 1000);
 
 
     function getUserdata() {
@@ -73,28 +102,29 @@ function Navbar() {
             setLevelText(response.level);
             setStreakText(response.streak);
             username = response.username;
+
+            getLeaderboardData().then((response) => {
+                const users = [];
+                const competitors = response["competitors"];
+                const leaderboardElement = ReactDOM.createRoot(document.querySelector('.leaderboard-scrollable'));
+
+                for (let i = 0; i < competitors.length; i++) {
+                    let competitor = competitors[i];
+                    let competitorElement = (
+                        <LeaderboardUser
+                            key={competitor["rank"]}
+                            place={competitor["rank"]}
+                            username={competitor["username"]}
+                            xp={competitor["daily_xp"]}
+                            highlight={username === competitor["username"]}
+                        />
+                    );
+                    users.push(competitorElement);
+                }
+                leaderboardElement.render(<>{users}</>);
+            });
         })
 
-        getLeaderboardData().then((response) => {
-            const users = [];
-            const competitors = response["competitors"];
-            const leaderboardElement = ReactDOM.createRoot(document.querySelector('.leaderboard-scrollable'));
-
-            for (let i = 0; i < competitors.length; i++) {
-                let competitor = competitors[i];
-                let competitorElement = (
-                    <LeaderboardUser
-                        key={competitor["rank"]}
-                        place={competitor["rank"]}
-                        username={competitor["username"]}
-                        xp={competitor["daily_xp"]}
-                        highlight={username === competitor["username"]}
-                    />
-                );
-                users.push(competitorElement);
-            }
-            leaderboardElement.render(<>{users}</>);
-        });
     };
 
     return (
@@ -153,6 +183,7 @@ function Navbar() {
                     <div className="leaderBoard">
                         <div className="leaderboard-header">Daily Leaderboard</div>
                         <div className="leaderboard-text">Top 10 learners today</div>
+                        <div className="leaderboard-time">{leaderboardTime}</div>
                         <div className="leaderboard-scrollable"></div>
                     </div>
                 </div>

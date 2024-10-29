@@ -243,17 +243,25 @@
     color: #c7c7bf;
     font-weight: bold;
     margin-top: 1em;
-    margin-bottom: 0.9em;
+    margin-bottom: 0;
 }
 
 .leaderboard-header {
     font-size: 1.8em;
+    margin-bottom: 0.3em;
 }
 
 .leaderboard-text {
     font-size: 1.2em;
-    transform: translateY(-2em);
     font-weight: normal;
+    transform: translateY(-1em);
+}
+
+.leaderboard-time{
+    color: #87b8fd;
+    transform: translateY(-0.5em);
+    font-weight: bold;
+    margin-bottom: 0.3em;
 }
 
 .leaderboard-user {
@@ -261,13 +269,11 @@
     font-size: 1.3em;
     display: flex;
     align-items: center;
-    gap: 0.5em;
+    gap: 0.3em;
     padding: 0.5em 0;
     width: 100%;
     justify-content: center;
     background-color: #242738;
-    border-bottom: 1px solid #605a5a;
-    border-top: 1px solid #605a5a;
 }
 
 .leaderboard-user.highlighted{
@@ -275,8 +281,6 @@
     border-bottom: 1px solid #5c74b1;
     border-top: 1px solid #5c74b1;
 }
-
-
 
 .leaderboard-scrollable{
     overflow-y: scroll;
@@ -286,21 +290,37 @@
 }
 
 .leaderboard-scrollable {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+    border-top: #605a5a solid;
+    border-top: 0.1em solid #605a5a;
 }
 
-.leaderboard-user span,
 .leaderboard-user img {
+    width: 1.5em;
+    height: 1.5em;
+    background-color: rgb(131, 137, 135);
+    border-radius: 10%;
+}
+
+.leaderboard-user span:first-child {
+    width: 2em;
+    text-align: center;
+}
+.leaderboard-user span:last-child {
+    width: 3em;
+    text-align: center;
+}
+
+.leaderboard-name {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 10em;
+    text-align: center;
+    flex-grow: 1;
     font-weight: bold;
 }
-
-.leaderboard-user img {
-    width: 0.85em;
-    background-color: rgb(149, 149, 149);
-    border-radius: 50%;
-}
-
 
 @keyframes progressBreathe {
     0% {

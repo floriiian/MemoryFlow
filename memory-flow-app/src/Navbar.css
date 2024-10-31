@@ -149,13 +149,20 @@
     transform: translateY(1em);
 }
 
-.daily-goal-text{
+.daily-goal-text {
     color: #c7c7bf;
     font-size: 1.2em;
-    margin-left: 4.5em;
+    margin: 0 auto; /* Center horizontally */
     font-weight: bold;
-    transform: translateY(3.2em);
+    transform: translateY(2.5em) translateX(1em); /* Adjust spacing */
+    display: flex;
+    align-items: center; /* Center vertically */
+    justify-content: center; /* Center text inside element */
+    max-width: 70%; /* Prevent overflow */
+    text-align: center; /* Center text */
+    word-break: break-word; /* Break long words */
 }
+
 
 .dailyGoal img{
     color: #c7c7bf;

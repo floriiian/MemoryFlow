@@ -34,9 +34,9 @@ function Navbar() {
 
     let username = ""
 
-    const [dailyGoalPercentage, setDailyGoalPercentage] = useState("10em");
+    const [dailyGoalPercentage, setDailyGoalPercentage] = useState("0em");
     const [dailyGoalText, setDailyGoalText] = useState("0/0");
-    const [dailyGoalDescription, setDailyGoalDescription] = useState("Blow your brains out");
+    const [dailyGoalDescription, setDailyGoalDescription] = useState("");
     const [leaderboardTime, setLeaderboardTime] = useState("00h 00m 00s");
 
     const [levelText, setLevelText] = useState("1");
@@ -51,7 +51,19 @@ function Navbar() {
         return midnight.getTime();
     }
 
-    const x = setInterval(function() {
+    function renderMissionType(type, amount) {
+        let sentence;
+        const sentenceTemplates = {
+            answer: `Answer ${amount} questions.`,
+            xp: `Collect ${amount} XP.`,
+            answer_correctly: `Correctly answer ${amount} questions.`,
+            answer_wrong: `Answer ${amount} wrong questions.`
+        };
+        sentence = sentenceTemplates[type] || '';
+        setDailyGoalDescription(sentence);
+    }
+
+    const timeLeftTillReset = setInterval(function() {
 
         let countDownDate = midnightTime();
         let now = new Date().getTime();
@@ -65,26 +77,14 @@ function Navbar() {
             + minutes + "m " + seconds + "s ")
 
         if (distance < 0) {
-            clearInterval(x);
+            clearInterval(timeLeftTillReset);
             setLeaderboardTime("Reset")
         }
     }, 1000);
 
 
-    function getUserdata() {
-        return getRequest("get/userdata")
-            .then(response => {
-                return response;
-            })
-            .catch(error => {
-                console.error("Error Status Code:", error.status);
-                console.error("Error Message:", error.message);
-                throw new Error(error.message);
-            });
-    }
-
-    function getLeaderboardData() {
-        return getRequest("get/leaderboard")
+    function getData(path) {
+        return getRequest(path)
             .then(response => {
                 return response;
             })
@@ -97,13 +97,13 @@ function Navbar() {
 
     window.onload = () => {
 
-        getUserdata().then((response) => {
+        getData("get/userdata").then((response) => {
 
             setLevelText(response.level);
             setStreakText(response.streak);
             username = response.username;
 
-            getLeaderboardData().then((response) => {
+            getData("get/leaderboard").then((response) => {
                 const users = [];
                 const competitors = response["competitors"];
                 const leaderboardElement = ReactDOM.createRoot(document.querySelector('.leaderboard-scrollable'));
@@ -122,6 +122,22 @@ function Navbar() {
                     users.push(competitorElement);
                 }
                 leaderboardElement.render(<>{users}</>);
+            });
+
+            getData("get/daily_missions").then((response) => {
+
+                console.log(response)
+
+                const mission = response["missions"][0];
+                const missionType = mission["type"];
+                const maxAmount = mission["amount"];
+                const currentAmount = mission["progress"];
+                const progress = (currentAmount * 100) / maxAmount;
+
+                renderMissionType(missionType, maxAmount)
+                setDailyGoalPercentage(Math.min(((16 * progress) / 100), 16).toString())
+                setDailyGoalText(`${currentAmount}/${maxAmount}`);
+
             });
         })
 
@@ -175,7 +191,7 @@ function Navbar() {
                         <a className={"daily-goal-text"}>{dailyGoalDescription}</a>
                         <img src={goalIcon} alt="Level logo"/>
                         <div className={"goal-progress-bar"}></div>
-                        <div className={"inner-goal-progress-bar"} style={{width: dailyGoalPercentage}}></div>
+                        <div className={"inner-goal-progress-bar"} style={{width: dailyGoalPercentage + "em"}}></div>
                         <div className={"process-bar-text"}>
                             <span>{dailyGoalText}</span>
                         </div>

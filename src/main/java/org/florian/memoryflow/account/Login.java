@@ -45,6 +45,8 @@ public class Login {
         if (success) {
             String user_id = DB.getValue("accounts", "user_id", "username", username);
             String webToken = createWebToken(user_id, 0);
+            ctx.removeCookie("sessionToken");
+            ctx.removeCookie("refreshToken");
             ctx.cookie("sessionToken", webToken);
             ctx.cookie("refreshToken", webToken);
             DB.updateValues("accounts", "token", "user_id", user_id, webToken);
@@ -62,6 +64,7 @@ public class Login {
             } else if (!checkAccessToken(accessToken)) {
                 ctx.removeCookie("sessionToken");
                 ctx.cookie("sessionToken", createWebToken(accessToken, 0));
+                LOGGER.debug("HERE!!!!!! IT HAPPENED YOU DUMB ASS RETARD ");
                 return true;
             } else {
                 return true;

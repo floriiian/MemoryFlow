@@ -14,14 +14,13 @@ import org.florian.memoryflow.api.requests.LoginRequest;
 import org.florian.memoryflow.api.requests.RegisterRequest;
 import org.florian.memoryflow.api.responses.ErrorResponse;
 import org.florian.memoryflow.api.responses.RegisterResponse;
-import org.florian.memoryflow.api.responses.UserdataResponse;
 import org.florian.memoryflow.db.Database;
 import org.florian.memoryflow.leaderboard.Leaderboard;
+import org.florian.memoryflow.missions.DailyMissions;
 
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.TimeUnit;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -47,12 +46,12 @@ public class Main {
 
         app.post("/register", ctx -> handlePostRequest("/register", ctx));
         app.post("/login", ctx -> handlePostRequest("/login", ctx));
+        app.post("/complete", ctx -> handlePostRequest("/complete", ctx));
 
         app.get("/get/userdata", ctx -> handleGetRequest("/get/userdata", ctx));
         app.get("/get/leaderboard", ctx -> handleGetRequest("/get/leaderboard", ctx));
-
+        app.get("/get/daily_missions", ctx -> handleGetRequest("/get/daily_missions", ctx));
     }
-
 
     private static void handleGetRequest(String path, Context ctx) throws Exception {
         boolean isValidSession = verifySession(ctx);
@@ -69,6 +68,8 @@ public class Main {
                 case "/get/leaderboard":
                     Leaderboard.handleLeaderboardRequest(ctx);
                     break;
+                case "/get/daily_missions":
+                    DailyMissions.handleDailyMissionsRequest(ctx);
             }
         }
     }
@@ -85,6 +86,9 @@ public class Main {
             case "/register":
                 handleLogin(isValidSession, jsonData, ctx, PostRequestType.REGISTER);
                 break;
+            case "/complete":
+                DailyMissions.handleCompletion(isValidSession, jsonData, ctx);
+                break;
         }
     }
 
@@ -96,6 +100,7 @@ public class Main {
         if (accessToken == null || refreshToken == null || !Login.validateSessionToken(accessToken, refreshToken, ctx)) {
             ctx.removeCookie("sessionToken");
             ctx.removeCookie("refreshToken");
+            LOGGER.debug("Removed Refresh & Session-token.");
             return false;
         }
         return true;

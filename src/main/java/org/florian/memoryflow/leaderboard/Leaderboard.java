@@ -48,7 +48,6 @@ public class Leaderboard {
         }
     }
 
-
     public static void handleLeaderboardRequest(Context ctx) {
         try {
             ctx.status(200);
@@ -62,7 +61,6 @@ public class Leaderboard {
     public static final Runnable getTopTenCompetitors = () -> {
         try {
             ArrayList<String> totalCompetitors = db.getAllValuesFromTable("leaderboard");
-
             ArrayList<int[]> competitorPairs = new ArrayList<>();
 
             for (int i = 0; i < totalCompetitors.size(); i += 2) {

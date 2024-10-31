@@ -52,7 +52,8 @@ public class Database {
                     "create_account_table",
                     "create_flashcard_table",
                     "create_progress_table",
-                    "create_leaderboard_table"
+                    "create_leaderboard_table",
+                    "create_daily_missions_table"
             };
 
             for (String table : availableTables) {
@@ -67,11 +68,11 @@ public class Database {
             }
             LOGGER.debug("{} tables have been initialized.", availableTables.length);
 
-            long initialDelay = getNextLeaderboardReset();
+            long initialDelay = getNextDatabaseReset();
             final ScheduledFuture<?> leaderboardHandler = scheduler.scheduleAtFixedRate(
-                    resetLeaderboard, initialDelay, TimeUnit.DAYS.toSeconds(1), SECONDS);
+                    resetDatabase, initialDelay, TimeUnit.DAYS.toSeconds(1), SECONDS);
 
-            LOGGER.debug("Next leaderboard reset in: {} seconds." ,initialDelay);
+            LOGGER.debug("Next leaderboard reset in: {} minutes.", initialDelay / 60);
 
         } catch (Exception e) {
             LOGGER.error(e);
@@ -80,23 +81,24 @@ public class Database {
 
     /* AUTOMATION */
 
-    final long getNextLeaderboardReset() {
+    final long getNextDatabaseReset() {
         LocalDateTime startOfNextDay = LocalDate.now().plusDays(1).atStartOfDay();
         long startOfNextDaySeconds = startOfNextDay.atZone(ZoneId.systemDefault()).toEpochSecond();
         return startOfNextDaySeconds - (System.currentTimeMillis() / 1000);
     }
 
-    final Runnable resetLeaderboard = () -> {
-        try {
-            PreparedStatement preparedStmt = CONNECTION.prepareStatement("TRUNCATE TABLE leaderboard");
-            preparedStmt.executeUpdate();
-            preparedStmt.close();
-            LOGGER.debug("Successfully reset leaderboard table.");
+    final Runnable resetDatabase = () -> {
+        try (
+                PreparedStatement resetLeaderboard = CONNECTION.prepareStatement("TRUNCATE TABLE leaderboard");
+                PreparedStatement resetMissions = CONNECTION.prepareStatement("TRUNCATE TABLE daily_missions")
+        ) {
+            resetMissions.executeUpdate();
+            resetLeaderboard.executeUpdate();
+            LOGGER.debug("Successfully reset database tables.");
         } catch (Exception e) {
-            LOGGER.debug(e);
+            LOGGER.error("Failed to reset database tables", e);
         }
     };
-
 
     /* GETTERS */
 
@@ -104,14 +106,7 @@ public class Database {
         String sql = "SELECT " + column + " FROM " + table + " WHERE " + where + " = ?";
 
         try (PreparedStatement preparedStmt = CONNECTION.prepareStatement(sql)) {
-            if (value instanceof Integer) {
-                preparedStmt.setInt(1, (Integer) value);
-            } else if (value instanceof String) {
-                preparedStmt.setString(1, (String) value);
-            } else {
-                LOGGER.debug("Invalid datatype");
-                return null;
-            }
+            preparedStmt.setObject(1, value);
             try (ResultSet results = preparedStmt.executeQuery()) {
                 if (results.next()) {
                     return results.getString(column);
@@ -123,6 +118,23 @@ public class Database {
             LOGGER.debug(e);
             return null;
         }
+    }
+    public String getValueWith2Conditions(String table, String column, String where, Object value, String where2, Object value2) {
+        String sql = "SELECT " + column + " FROM " + table + " WHERE " + where + " = ? AND " + where2 + " = ?";
+
+        try (PreparedStatement preparedStmt = CONNECTION.prepareStatement(sql)) {
+            preparedStmt.setObject(1, value);
+            preparedStmt.setObject(2, value2);
+
+            try (ResultSet results = preparedStmt.executeQuery()) {
+                if (results.next()) {
+                    return results.getString(column);
+                }
+            }
+        } catch (SQLException e) {
+            LOGGER.error("Error fetching value with conditions: ", e);
+        }
+        return null;
     }
 
     public ArrayList<String> getUserData(String userID) throws SQLException {
@@ -270,13 +282,7 @@ public class Database {
         }
         try {
             PreparedStatement preparedStmt = CONNECTION.prepareStatement(sql);
-            if (value instanceof String) {
-                preparedStmt.setString(1, (String) value);
-            } else if (value instanceof Integer) {
-                preparedStmt.setInt(1, (Integer) value);
-            } else {
-                LOGGER.debug("Update failed, unsupported datatype.");
-            }
+            preparedStmt.setObject(1, value);
             preparedStmt.executeUpdate();
             preparedStmt.close();
         } catch (Exception e) {

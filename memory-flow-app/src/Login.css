@@ -26,13 +26,26 @@
     position: sticky;
 }
 
+.addCardsForm {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    width: 40em;
+    position: relative;
+    transform: scale(1.5) translateY(-10%);
+    font-weight: 400;
+    animation: pageReveal 0.2s;
+}
+
 .login_form {
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     border-radius: 8px;
-    width: 300px;
+    width: 20em;
     position: relative;
     transform: scale(1.5) translateY(-10%);
     font-weight: 400;

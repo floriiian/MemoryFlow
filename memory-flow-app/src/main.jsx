@@ -7,6 +7,7 @@ import Login from './routes/Login.jsx';
 import Navbar from "./Navbar.jsx";
 import Register from "./routes/Register.jsx";
 import MyCards from "./routes/MyCards.jsx";
+import AddCards from "./routes/AddCards.jsx";
 
 
 const router = createBrowserRouter([
@@ -17,6 +18,16 @@ const router = createBrowserRouter([
     {
         path: "/my_cards",
         element: <MyCards/>,
+        children: [
+            {
+                index: true,
+                element: <Navbar />
+            }
+        ]
+    },
+    {
+        path: "/add_cards",
+        element: <AddCards/>,
         children: [
             {
                 index: true,

@@ -6,6 +6,8 @@
     grid-template-columns: repeat(2, 20em);
     grid-gap: 4em;
     z-index: 10;
+    animation: cardsAppear 0.5s ease-in;
+
 }
 
 .flashcard {
@@ -15,7 +17,7 @@
     border-radius: 10px;
     padding: 20px;
     transition: 0.1s;
-    box-shadow: 0 6px #4a4a7b;
+    box-shadow: 0 1px 1px 3px #424c63;
     overflow: hidden;
 }
 
@@ -40,13 +42,13 @@
     font-weight: bold;
     z-index: 5;
     color: #dfdbdb;
-    box-shadow: 0 0.01em 0 0.2em #61619d;
+    box-shadow: 0 0.01em 0 0.2em #7276a4;
     background: rgb(91, 92, 138);
     font-size: 16px;
-
 }
 .flashcard-button:hover{
     background: rgb(100, 101, 153);
+
     cursor: pointer;
 }
 
@@ -55,7 +57,7 @@
     border: none;
     cursor: pointer;
     padding: 0;
-    box-shadow: 0 0.02em 0 0.10em #61619d;
+    box-shadow: 0 0.02em 0 0.1em #7276a4;
     transform: translateY(0.1em);
 }
 .flashcard-button:focus{
@@ -63,16 +65,32 @@
 }
 
 .inner-flashcard p {
-     color: #f4f4ec;
     font-weight: bold;
 }
 
 .flashcard-category{
     margin-top: 0.2em;
     font-size: 2em;
+    color: #dcdcdc;
 }
 .flashcard-amount{
     margin-top: -1.5em;
     margin-bottom: 2em;
     font-size: 1.1em;
+    color: #9ba9d5;
+}
+
+@keyframes cardsAppear {
+    0%  {
+        opacity: 0;
+        filter: brightness(1);
+    }
+    50% {
+        filter: brightness(1.5);
+    }
+    100% {
+        opacity: 1;
+        filter: brightness(1);
+    }
+
 }

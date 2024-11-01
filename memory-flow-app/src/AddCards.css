@@ -1,0 +1,101 @@
+.flashCardCategories {
+    position: fixed;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 1em;
+    z-index: 10;
+    transform: translateY(12%) scale(0.75);
+    scroll-behavior: smooth;
+    overflow-y: scroll;
+    background: #1a1c2e;
+    border-radius: 10px;
+    height: 26.7em;
+    padding-inline: 2px;
+    padding: 0.2em 1em;
+    box-sizing: border-box;
+}
+
+.flashCardCategories::-webkit-scrollbar{
+    background-color: #9b9b9b;
+    border-radius: 10px;
+    width: 0.6em;
+}
+.flashCardCategories::-webkit-scrollbar-thumb {
+    background: #f1f1f1;
+}
+
+.flashCardCategory {
+    background: rgb(53, 55, 86);
+    width: 20em;
+    height: 10em;
+    border-radius: 10px;
+    padding: 20px;
+    transition: 0.1s;
+    box-shadow: 0 1px 1px 3px #424c63;
+
+}
+.flashCardCategory:hover{
+    background: rgb(62, 62, 98);
+    transform: scale(1.01);
+    cursor: pointer;
+}
+.flashCardCategory:active{
+    background: rgb(75, 75, 121);
+}
+
+.inner-flashcard p {
+    font-weight: bold;
+}
+
+.flashcard-category{
+    margin-top: 0.2em;
+    width: 9em;
+    font-size: 2em;
+    color: #dcdcdc;
+
+}
+.flashcard-amount{
+    margin-top: -1.5em;
+    margin-bottom: 2em;
+    font-size: 1.1em;
+    color: #9ba9d5;
+}
+
+.add-cards-button {
+    width: 100%;
+    padding: 10px 120px;
+    margin-top: 9px;
+    margin-bottom: 9px;
+    font-weight: bold;
+    font-size: 12px;
+    background-color: #647eff;
+    color: #fbfbfb;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 0.3em #394aa3;
+    cursor: pointer;
+    transition: 0.1s;
+}
+
+.add-cards-button:hover {
+    background-color: #7b8df9;
+}
+
+.add-cards-button:active {
+    border: none;
+    transform: translateY(5%);
+    box-shadow: none;
+}
+
+.flashcard-logo{
+    margin-top: 1em;
+    width: 4em;
+    transform: translateX(7.6em);
+}
+.flashcard-add-text{
+    margin-top: 0.4em;
+    width: 9em;
+    transform: translateX(1.5em);
+    font-size: 1.8em;
+    color: #dcdcdc;
+}

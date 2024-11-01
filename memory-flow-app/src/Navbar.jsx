@@ -3,6 +3,7 @@ import './index.css'
 import myCardsLogo from './assets/sidebar-icons/home.png';
 import loginLogo from './assets/sidebar-icons/user.png';
 import downloadLogo from './assets/sidebar-icons/download.png';
+import addCardLogo from './assets/sidebar-icons/add.png';
 import {useEffect, useState} from "react";
 import {Outlet, useNavigate} from "react-router-dom";
 import deadStreakIcon from './assets/progression-icons/dead_streak_icon.png';
@@ -95,8 +96,7 @@ function Navbar() {
             });
     }
 
-    window.onload = () => {
-
+    useEffect(() => {
         getData("get/userdata").then((response) => {
 
             setLevelText(response.level);
@@ -106,6 +106,8 @@ function Navbar() {
             getData("get/leaderboard").then((response) => {
                 const users = [];
                 const competitors = response["competitors"];
+
+                console.log(competitors);
                 const leaderboardElement = ReactDOM.createRoot(document.querySelector('.leaderboard-scrollable'));
 
                 for (let i = 0; i < competitors.length; i++) {
@@ -141,7 +143,7 @@ function Navbar() {
             });
         })
 
-    };
+    }, [location]);
 
     return (
         <>
@@ -156,6 +158,13 @@ function Navbar() {
                             <div className={"icon"} onClick={() => redirectToPage("my_cards")}>
                                 <img alt="Download cards logo" src={myCardsLogo}/>
                                 <span>My cards</span>
+                            </div>
+                        </li>
+                        <li className={selectedButton === "add_cards" ? "active" : ""}>
+                            <i></i>
+                            <div className={"icon"} onClick={() => redirectToPage("add_cards")}>
+                                <img alt="Add cards logo" src={addCardLogo}/>
+                                <span>Add cards</span>
                             </div>
                         </li>
                         <li className={selectedButton === "download_cards" ? "active" : ""}>
@@ -178,7 +187,8 @@ function Navbar() {
                 <div className="progress-bar-navigation">
                     <div className={"progress-header"}>
                         <div className={"progress-display"}>
-                            <img className={"progress-img"} src={streakText === "0" ? deadStreakIcon : aliveStreakIcon} alt="Streak logo"/>
+                            <img className={"progress-img"} src={streakText === "0" ? deadStreakIcon : aliveStreakIcon}
+                                 alt="Streak logo"/>
                             <span className={"progress-text streak"} style={{color: streakText === "0" ? "#615b5b" : "orangered"}}>{streakText}</span>
                             <div className={"level-icon"}></div>
                             <img className={"progress-img"} src={levelIcon} alt="Level logo"/>

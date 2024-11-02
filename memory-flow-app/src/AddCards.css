@@ -15,11 +15,67 @@
     box-sizing: border-box;
 }
 
-.flashCardCategories::-webkit-scrollbar{
+.addCardsForm {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    border-radius: 8px;
+    width: 100%;
+    position: relative;
+    transform: scale(1.5) translateY(-10%);
+    font-weight: 400;
+    animation: pageReveal 0.2s;
+}
+
+.add-card-input {
+    caret-color: #95a6ff;
+    height: 33px;
+    font-size: 14px;
+    color: white;
+    width: 26em;
+    padding: 9px;
+    margin: 8px 0;
+    border: none;
+    box-shadow: 0 0 0 0.1em #55586f;
+    border-radius: 10px;
+    background: #292a39;
+    box-sizing: border-box;
+    resize: vertical;
+    min-height: 2em;
+    max-height: 5em;
+    scrollbar-width: none;
+    transition: transform 0.2s;
+}
+
+.add-card-input:focus {
+    transform: scale(1.01);
+    color: white;
+    outline: none;
+    box-shadow: 0 0 0 0.1em #95a6ff;
+}
+
+.add-card-input:focus ~ .input-placeholder {
+    top: 1.2em;
+    font-size: 9px;
+}
+
+.add-card-input:-webkit-autofill, textarea:-webkit-autofill, select:-webkit-autofill {
+    background-color: #292a39 !important;
+    -webkit-box-shadow: 0 0 0 1000px #292a39 inset;
+}
+
+.add-card-input.false {
+    background-color: #40000a !important;
+    box-shadow: 0 0 0 0.1em #cc0000;
+}
+
+.flashCardCategories::-webkit-scrollbar {
     background-color: #9b9b9b;
     border-radius: 10px;
     width: 0.6em;
 }
+
 .flashCardCategories::-webkit-scrollbar-thumb {
     background: #f1f1f1;
 }
@@ -34,12 +90,14 @@
     box-shadow: 0 1px 1px 3px #424c63;
 
 }
-.flashCardCategory:hover{
+
+.flashCardCategory:hover {
     background: rgb(62, 62, 98);
     transform: scale(1.01);
     cursor: pointer;
 }
-.flashCardCategory:active{
+
+.flashCardCategory:active {
     background: rgb(75, 75, 121);
 }
 
@@ -47,14 +105,15 @@
     font-weight: bold;
 }
 
-.flashcard-category{
+.flashcard-category {
     margin-top: 0.2em;
     width: 9em;
     font-size: 2em;
     color: #dcdcdc;
 
 }
-.flashcard-amount{
+
+.flashcard-amount {
     margin-top: -1.5em;
     margin-bottom: 2em;
     font-size: 1.1em;
@@ -75,27 +134,64 @@
     box-shadow: 0 0.3em #394aa3;
     cursor: pointer;
     transition: 0.1s;
+    outline: none;
 }
 
 .add-cards-button:hover {
     background-color: #7b8df9;
+    outline: none;
 }
 
 .add-cards-button:active {
     border: none;
     transform: translateY(5%);
     box-shadow: none;
+    outline: none;
 }
 
-.flashcard-logo{
-    margin-top: 1em;
-    width: 4em;
-    transform: translateX(7.6em);
+.flashcard-logo {
+    margin-top: 0.6em;
+    width: 5em;
+    transform: translateX(7.5em);
 }
-.flashcard-add-text{
+
+.flashcard-add-text {
     margin-top: 0.4em;
     width: 9em;
-    transform: translateX(1.5em);
-    font-size: 1.8em;
-    color: #dcdcdc;
+    transform: translateX(1.9em);
+    font-size: 1.7em;
+    color: #fdfdfd;
+}
+
+.add-cards-icon {
+    position: absolute;
+    display: flex;
+    transform: translateX(-50%);
+    pointer-events: none;
+    width: 90%;
+    top: -1em;
+    left: -75%;
+}
+
+.add-cards-icon.animated {
+    animation: addCardsAnimation 0.3s ease-in;
+}
+
+
+@keyframes addCardsAnimation {
+    0% {
+        transform: translateX(-50%) rotate(0deg);
+    }
+    25% {
+        transform: translateX(-50%)  rotate(1deg);
+    }
+    50% {
+        transform: translateX(-50%) rotate(-1deg);
+    }
+    75% {
+        transform: translateX(-50%) rotate(1deg);
+    }
+    100% {
+        transform: translateX(-50%)  rotate(0deg);
+    }
 }

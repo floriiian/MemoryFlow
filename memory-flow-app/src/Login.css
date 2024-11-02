@@ -26,19 +26,6 @@
     position: sticky;
 }
 
-.addCardsForm {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    border-radius: 8px;
-    width: 40em;
-    position: relative;
-    transform: scale(1.5) translateY(-10%);
-    font-weight: 400;
-    animation: pageReveal 0.2s;
-}
-
 .login_form {
     display: flex;
     flex-direction: column;
@@ -195,15 +182,14 @@ input[data-autocompleted] {
 }
 
 .login-icon {
-    filter: invert(100%) sepia(16%) saturate(7463%) hue-rotate(222deg) brightness(119%) contrast(115%);
     position: absolute;
     display: flex;
-    transform: translateX(-50%) scale(0.8);
+    transform: translateX(-50%) scale(0.6);
     pointer-events: none;
 }
 
 .login-icon.icon1.login{
-    width: 120%;
+    width: 90%;
     top: 30%;
     left: -69%;
 }
@@ -215,7 +201,7 @@ input[data-autocompleted] {
 }
 
 .login-icon.icon1.register{
-    width: 80%;
+    width: 60.5%;
     top: 48%;
     left: -29%;
 }

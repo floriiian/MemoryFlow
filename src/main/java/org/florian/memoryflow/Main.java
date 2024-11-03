@@ -14,6 +14,7 @@ import org.florian.memoryflow.api.requests.LoginRequest;
 import org.florian.memoryflow.api.requests.RegisterRequest;
 import org.florian.memoryflow.api.responses.ErrorResponse;
 import org.florian.memoryflow.api.responses.RegisterResponse;
+import org.florian.memoryflow.application.Flashcards;
 import org.florian.memoryflow.db.Database;
 import org.florian.memoryflow.leaderboard.Leaderboard;
 import org.florian.memoryflow.missions.DailyMissions;
@@ -47,10 +48,12 @@ public class Main {
         app.post("/register", ctx -> handlePostRequest("/register", ctx));
         app.post("/login", ctx -> handlePostRequest("/login", ctx));
         app.post("/complete", ctx -> handlePostRequest("/complete", ctx));
+        app.post("/add_card", ctx -> handlePostRequest("/add_card", ctx));
 
         app.get("/get/userdata", ctx -> handleGetRequest("/get/userdata", ctx));
         app.get("/get/leaderboard", ctx -> handleGetRequest("/get/leaderboard", ctx));
         app.get("/get/daily_missions", ctx -> handleGetRequest("/get/daily_missions", ctx));
+        app.get("get/card_categories", ctx -> handleGetRequest("/get/card_categories", ctx));
     }
 
     private static void handleGetRequest(String path, Context ctx) throws Exception {
@@ -70,6 +73,10 @@ public class Main {
                     break;
                 case "/get/daily_missions":
                     DailyMissions.handleDailyMissionsRequest(ctx);
+                    break;
+                case "/get/card_categories":
+                    Flashcards.getFlashCardCategories(ctx);
+                    break;
             }
         }
     }
@@ -89,6 +96,8 @@ public class Main {
             case "/complete":
                 DailyMissions.handleCompletion(isValidSession, jsonData, ctx);
                 break;
+            case "/add_card":
+                Flashcards.handleFlashcardAdd(isValidSession, jsonData, ctx);
         }
     }
 

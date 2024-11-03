@@ -31,7 +31,6 @@ public class Login {
     final static int HOUR = 3600;
     final static int REFRESH_TOKEN_LIFETIME = 720;
     final static int ACCESS_TOKEN_LIFETIME = 900;
-    final static int CURRENT_SECONDS = (int) (System.currentTimeMillis() / 1000);
 
     public static void handleLoginRequest(Context ctx, LoginRequest decodedJson) throws JsonProcessingException {
 
@@ -56,15 +55,20 @@ public class Login {
         ctx.result(OBJECT_MAPPER.writeValueAsString(new LoginResponse(status)));
     }
 
+    public static int getCurrentSeconds() {
+        return (int) (System.currentTimeMillis() / 1000);
+    }
+
     public static boolean validateSessionToken(String accessToken, String refreshToken, Context ctx) {
+
         try {
             Object[] refreshTokenData = checkRefreshToken(refreshToken);
             if (!((boolean) refreshTokenData[0])) {
                 return false;
             } else if (!checkAccessToken(accessToken)) {
+                String accountId = Login.getAccountIDByToken(accessToken);
                 ctx.removeCookie("sessionToken");
-                ctx.cookie("sessionToken", createWebToken(accessToken, 0));
-                LOGGER.debug("HERE!!!!!! IT HAPPENED YOU DUMB ASS RETARD ");
+                ctx.cookie("sessionToken", createWebToken(accountId, 0));
                 return true;
             } else {
                 return true;
@@ -104,7 +108,7 @@ public class Login {
         jsonHeader.put("typ", "JWT");
 
         if (currentTime == 0) {
-            currentTime = CURRENT_SECONDS;
+            currentTime = getCurrentSeconds();
         }
 
         jsonPayload.put("id", accountID);
@@ -143,7 +147,7 @@ public class Login {
         if (refreshTokenAccountID == null || refreshTokenIssued == 0) {
             return new Object[]{false};
         }
-        if ((refreshTokenIssued / HOUR) + REFRESH_TOKEN_LIFETIME <= (CURRENT_SECONDS / HOUR)) {
+        if ((refreshTokenIssued / HOUR) + REFRESH_TOKEN_LIFETIME <= (getCurrentSeconds() / HOUR)) {
             return new Object[]{false};
         } else return new Object[]{
                 refreshToken.equals(DB.getValue("accounts", "token", "user_id", refreshTokenAccountID)),
@@ -159,11 +163,9 @@ public class Login {
             JsonNode accessTokenJSON = OBJECT_MAPPER.readTree(decodedJson);
             String accessTokenAccountID = accessTokenJSON.get("id").asText();
             int accessTokenIssued = accessTokenJSON.get("iat").asInt();
-
             if (accessTokenAccountID == null || accessTokenIssued == 0) {
                 return false;
-
-            } else if (accessTokenIssued + ACCESS_TOKEN_LIFETIME <= CURRENT_SECONDS) {
+            } else if (accessTokenIssued + ACCESS_TOKEN_LIFETIME <= getCurrentSeconds()) {
                 return false;
             } else {
                 return accessToken.equals(createWebToken(accessTokenAccountID, accessTokenIssued));

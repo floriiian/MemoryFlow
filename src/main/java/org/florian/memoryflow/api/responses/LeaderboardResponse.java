@@ -4,5 +4,5 @@ import org.florian.memoryflow.leaderboard.Competitor;
 
 import java.util.ArrayList;
 
-public record LeaderboardResponse(ArrayList<Competitor> competitors) {
+public record LeaderboardResponse(ArrayList<Competitor>  competitors) {
 }

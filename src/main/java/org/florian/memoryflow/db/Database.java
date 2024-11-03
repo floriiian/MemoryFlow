@@ -15,6 +15,7 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
 import org.ini4j.Ini;
+import org.jetbrains.annotations.Nullable;
 
 import static java.util.concurrent.TimeUnit.SECONDS;
 
@@ -88,14 +89,11 @@ public class Database {
     }
 
     final Runnable resetDatabase = () -> {
-        try (
-                PreparedStatement resetLeaderboard = CONNECTION.prepareStatement("TRUNCATE TABLE leaderboard");
-                PreparedStatement resetMissions = CONNECTION.prepareStatement("TRUNCATE TABLE daily_missions")
-        ) {
-            resetMissions.executeUpdate();
-            resetLeaderboard.executeUpdate();
+        try (Statement stmt = CONNECTION.createStatement()) {
+            stmt.executeUpdate("TRUNCATE TABLE leaderboard");
+            stmt.executeUpdate("TRUNCATE TABLE daily_missions");
             LOGGER.debug("Successfully reset database tables.");
-        } catch (Exception e) {
+        } catch (SQLException e) {
             LOGGER.error("Failed to reset database tables", e);
         }
     };
@@ -199,27 +197,57 @@ public class Database {
         try (PreparedStatement preparedStmt = CONNECTION.prepareStatement(sql)) {
             preparedStmt.setString(1, user_id);
             preparedStmt.setString(2, category);
-            try (ResultSet results = preparedStmt.executeQuery()) {
-                if (!results.next()) {
-                    return null;
-                } else {
-                    HashMap<String, String> resultList = new HashMap<>();
-                    ResultSetMetaData metadata = results.getMetaData();
-                    int columnCount = metadata.getColumnCount();
-
-                    while (results.next()) {
-                        for (int i = 1; i <= columnCount; i += 2) {
-                            String question = results.getString(i);
-                            String solution = results.getString(i + 1);
-                            resultList.put(question, solution);
-                        }
-                    }
-                    return resultList;
-                }
-            }
+            return getStringStringHashMap(preparedStmt);
         } catch (Exception e) {
             LOGGER.debug(e);
             return null;
+        }
+    }
+
+    public HashMap<String, Integer> getCategoriesByOwner(String user_id) {
+        String sql = "SELECT category, COUNT(question) FROM flashcards WHERE user_id = ? GROUP BY category";
+
+        try (PreparedStatement preparedStmt = CONNECTION.prepareStatement(sql)) {
+            preparedStmt.setString(1, user_id);
+            return getStringIntegerHashMap(preparedStmt);
+        } catch (Exception e) {
+            LOGGER.debug(e);
+            return null;
+        }
+    }
+
+    @Nullable
+    private HashMap<String, String> getStringStringHashMap(PreparedStatement preparedStmt) throws SQLException {
+        try (ResultSet results = preparedStmt.executeQuery()) {
+            if (!results.next()) {
+                return null;
+            } else {
+                HashMap<String, String> resultList = new HashMap<>();
+                ResultSetMetaData metadata = results.getMetaData();
+                int columnCount = metadata.getColumnCount();
+
+                while (results.next()) {
+                    for (int i = 1; i <= columnCount; i += 2) {
+                        String key = results.getString(i);
+                        String value = results.getString(i + 1);
+                        resultList.put(key, value);
+                    }
+                }
+                return resultList;
+            }
+        }
+    }
+
+    private HashMap<String, Integer> getStringIntegerHashMap(PreparedStatement preparedStmt) throws SQLException {
+        try (ResultSet results = preparedStmt.executeQuery()) {
+            HashMap<String, Integer> resultList = new HashMap<>();
+
+            while (results.next()) {
+                String category = results.getString(1); // category is in the first column
+                int count = results.getInt(2); // count of questions is in the second column
+                resultList.put(category, count);
+            }
+            return resultList;
         }
     }
 

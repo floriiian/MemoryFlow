@@ -1,34 +1,93 @@
 package org.florian.memoryflow.application;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import io.javalin.http.Context;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.florian.memoryflow.account.Login;
+import org.florian.memoryflow.api.responses.CardCategoriesResponse;
+import org.florian.memoryflow.api.responses.ErrorResponse;
 import org.florian.memoryflow.db.Database;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
+
 public class Flashcards {
 
-    Database db = Database.getInstance();
-    final private Logger LOGGER = LogManager.getLogger();
+    static Database db = Database.getInstance();
+    static final private Logger LOGGER = LogManager.getLogger();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    public void getFlashCardCategories(String user_id) {
-        ArrayList<String> val = db.getAllValuesByType("flashcards", "category", "user_id", user_id);
-        val.forEach(LOGGER::debug);
+    public static void getFlashCardCategories(Context ctx) throws Exception {
+        String user_id =  Login.getAccountIDByToken(ctx.cookie("sessionToken"));
+        HashMap<String, Integer> values = db.getCategoriesByOwner(user_id);
+        ctx.status(200);
+        ctx.contentType("application/json");
+        ctx.result(OBJECT_MAPPER.writeValueAsString(new CardCategoriesResponse(values)));
+
     }
 
     public void getFlashCardsByCategory(String user_id, String category) {
         HashMap<String, String> map = db.getFlashCardsByOwner(user_id, category);
 
-        if(map != null){
+        if (map != null) {
             map.forEach((key, value) -> {
                 System.out.println("Key=" + key + ", Value=" + value);
             });
         }
     }
 
-    public void addNewFlashcard(String user_id, String question, String solution, String category) {
+    private static String getCardFromUserId(String user_id, String question) {
+        return db.getValueWith2Conditions(
+                "flashcards", "question",
+                "user_id", user_id,
+                "question", question
+        );
+    }
+
+    public static void handleFlashcardAdd(boolean validSession, JsonNode decodedJson, Context ctx) throws Exception {
+
+        if (!validSession) {
+            returnFailedRequest(ctx, "You're not logged in.");
+            return;
+        }
+
+        String solution = decodedJson.get("solution").asText();
+        String question = decodedJson.get("question").asText();
+        String category = decodedJson.get("category").asText();
+
+        if (category == null || category.isEmpty() || category.isBlank()) {
+            returnFailedRequest(ctx, "Invalid category, try selecting a different one.");
+        } else if (solution == null || solution.isEmpty()) {
+            returnFailedRequest(ctx, "You haven't defined a solution.");
+        } else if (question == null || question.isEmpty()) {
+            returnFailedRequest(ctx, "You haven't defined a question.");
+        } else if (solution.length() > 200) {
+            returnFailedRequest(ctx, "Come on, storage isn't free, keep your answer under 200 letters.");
+        } else if (question.length() > 200) {
+            returnFailedRequest(ctx, "Come on, storage isn't free, keep your solution under 200 letters.");
+        } else {
+            String accountId = Login.getAccountIDByToken(ctx.cookie("sessionToken"));
+            if (getCardFromUserId(accountId, question) != null) {
+                returnFailedRequest(ctx, "You've already added a Flashcard with that question.");
+            } else {
+                addNewFlashcard(accountId, question, solution, category);
+                ctx.status(200);
+            }
+        }
+    }
+
+    private static void returnFailedRequest(Context ctx, String input) throws JsonProcessingException {
+        ctx.status(500);
+        ctx.contentType("application/json");
+        ctx.result(OBJECT_MAPPER.writeValueAsString(new ErrorResponse(input)));
+    }
+
+    public static void addNewFlashcard(String user_id, String question, String solution, String category) {
 
         db.insertValues(
                 "flashcards",

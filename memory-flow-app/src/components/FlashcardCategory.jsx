@@ -6,7 +6,7 @@ const FlashCardCategory = (props) => {
         <div
             key={props.name}
             className="flashCardCategory"
-            onClick={() => props.setCategory(props.name)} // Call the passed setCategory function here
+            onClick={() => props.type === "add" ? props.switchToCategoryState() :  props.setCategory(props.name)}
         >
             <div className="inner-flashcard">
                 <p className="flashcard-category">{props.name}</p>

@@ -1,30 +1,28 @@
 import {Form, Link, redirect, useNavigate, useSubmit} from "react-router-dom";
 import React, {useEffect, useRef, useState} from "react";
 import ReactDOM from "react-dom/client";
-import {checkCredentials, hideFormHint, setFormHint, showFormHint} from "../handlers/accountHandlers.jsx";
+import {hideFormHint, showFormHint} from "../handlers/accountHandlers.jsx";
 import {postRequest} from "../api/Requests.jsx";
 import FlashCardCategory from "../components/FlashcardCategory.jsx";
 import hintIcon from '../assets/hint_icon.png';
 import teacherIcon from '../assets/teacher.png'
 import '../Login.css';
 import '../AddCards.css';
-import bookIcon from "../assets/login-icons/book.png";
-import chemistryIcon from "../assets/login-icons/chemistry.png";
-import {checkFlashcard} from "../handlers/cardHandlers.jsx";
+import {checkFlashcard, getData} from "../handlers/cardHandlers.jsx";
 
 function AddCards() {
 
     const [formData, setFormData] = useState({
-            question: "", solution: ""
+            question: "", solution: "", category: ""
         }
     );
     const navigate = useNavigate();
 
-    const [selectedCategory, setSelectedCategory] = useState(null);
     const [currentFormState, setFormState] = useState(0)
 
     const [hint1Toggled, toggleHint1] = useState(false);
     const [hint2Toggled, toggleHint2] = useState(false);
+    const [hint3Toggled, toggleHint3] = useState(false);
     const [serverHintToggled, toggleServerHint] = useState(false);
 
     const [hint1Text, setHint1Text] = useState(undefined);
@@ -33,48 +31,57 @@ function AddCards() {
 
 
     const [instructionText, setInstructionText] = useState("Select your Flashcard's category.")
+    const flashcardContainerRef = useRef(null);
 
     function setCategory(category) {
-        setSelectedCategory(category)
+        formData.category = category;
         if (currentFormState === 0) {
             setFormState(1)
             setInstructionText("Name and describe your Flashcard.")
         }
     }
 
-
-    const flashcardContainerRef = useRef(null);
+    function switchToCategoryState() {
+        setFormState(3)
+        setInstructionText("Name and describe your Flashcard.")
+    }
 
     useEffect(() => {
         const flashcardContainerEl = document.querySelector('.flashCardCategories');
         if (flashcardContainerEl && !flashcardContainerRef.current) {
             flashcardContainerRef.current = ReactDOM.createRoot(flashcardContainerEl);
         }
-        const cards = [];
-        const categories = {
-            0: {name: "Mathematics", amount: 20},
-            1: {name: "Physics", amount: 19},
-            2: {name: "German", amount: 11},
-            3: {name: "Chinese", amount: 912},
-            4: {name: "Japanese", amount: 12},
-            5: {name: "Geography", amount: 1},
-            6: {name: "PHP", amount: 15},
-            7: {name: "", type: "add"}
-        }
 
-        Object.entries(categories).forEach(([key, competitor]) => {
-            let competitorElement = (
-                <FlashCardCategory
-                    key={key}
-                    name={competitor.name}
-                    amount={competitor.amount}
-                    type={competitor.type}
-                    setCategory={setCategory}
-                />
-            );
-            cards.push(competitorElement);
-        });
-        flashcardContainerRef.current.render(<>{cards}</>);
+        const cards = [];
+        const categoryCards = {}
+
+        getData("get/card_categories").then((response) => {
+            const categories = response["categories"];
+
+            let currentEntry = 0;
+            for (const [category, amount] of Object.entries(categories)) {
+                categoryCards[currentEntry] = {name: category, amount: amount};
+                currentEntry++;
+            }
+            categoryCards[currentEntry] = {name: "", type: "add"};
+        }).then(
+            (response) => {
+                Object.entries(categoryCards).forEach(([key, category]) => {
+                    let categoryElement = (
+                        <FlashCardCategory
+                            key={key}
+                            name={category.name}
+                            amount={category.amount}
+                            type={category.type}
+                            setCategory={setCategory}
+                            switchToCategoryState={switchToCategoryState}
+                        />
+                    );
+                    cards.push(categoryElement);
+                });
+                flashcardContainerRef.current.render(<>{cards}</>);
+            }
+        )
     })
 
 
@@ -89,12 +96,12 @@ function AddCards() {
         hideFormHint(toggleHint1);
         hideFormHint(toggleHint2);
 
-        const credentialsResult = checkFlashcard(formData.question, formData.solution)
+        const credentialsResult = checkFlashcard(formData.question, formData.solution, formData.category)
         let result = credentialsResult;
 
         if (credentialsResult === "valid") {
             postRequest("add_card", {
-                "category" : selectedCategory,
+                "category" : formData.category,
                 "question": formData.question,
                 "solution": formData.solution
             })
@@ -187,6 +194,29 @@ function AddCards() {
                                 <img alt="Hinting Icon" src={hintIcon}/>
                                 {hint2Text}
                             </div>
+                            <input
+                                className={hint3Toggled ? "add-card-input category false" : "add-card-input category"}
+                                onKeyDown={event => {
+                                    if (event.key === "Enter") {
+                                        handleSubmit(event);
+                                    }
+                                }}
+                                style = {{display: currentFormState === 3 ? "grid" : "none"}}
+                                value={formData.category}
+                                placeholder={"Category"}
+                                autoComplete={"one-time-code"}
+                                onChange={handleFormChange}
+                                name="category"
+                            />
+                            <div
+                                style={{
+                                    opacity: hint3Toggled ? 1 : 0,
+                                    height: hint3Toggled ? "auto" : "0",
+                                }}
+                                className={"inputHint question"}>
+                                <img alt="Hinting Icon" src={hintIcon}/>
+                                {hint1Text}
+                            </div>
                             <button type="submit" className="add-cards-button">Add</button>
                         </Form>
                         <div
@@ -197,7 +227,8 @@ function AddCards() {
                         </div>
                     </div>
                     <div className="login-icon-container">
-                        <img className={currentFormState === 0 ? "add-cards-icon" : "add-cards-icon animated"} src={teacherIcon} alt="Book Logo"/>
+                        <img className={currentFormState === 0 ? "add-cards-icon" : "add-cards-icon animated"}
+                             src={teacherIcon} alt="Book Logo"/>
                     </div>
                 </div>
             </div>

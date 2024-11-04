@@ -1,14 +1,32 @@
 .flashcardsContainer {
     position: fixed;
-    left: 50%;
-    transform: translateX(-64%) translateY(25%);
+    transform: translate(33%,12%);
     display: grid;
-    grid-template-columns: repeat(2, 20em);
-    grid-gap: 4em;
+    grid-template-columns: repeat(2, minmax(0, 22em));
+    grid-gap: 2em;
     z-index: 10;
     animation: cardsAppear 0.5s ease-in;
-
+    max-width: 90vw;
+    max-height: 85vh;
+    padding: 1em;
+    margin-right: 1em;
+    overflow-y: auto;
 }
+
+.flashcardsContainer::-webkit-scrollbar {
+    display: none;
+}
+
+
+
+
+/* @media (max-width: 1450px) {
+    .flashcardsContainer {
+        grid-template-columns: 1fr;
+        transform: translate(75%, 50%);
+    }
+}
+*/
 
 .flashcard {
     background: rgb(53, 55, 86);

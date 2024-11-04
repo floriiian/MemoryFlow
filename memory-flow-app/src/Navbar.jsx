@@ -4,7 +4,7 @@ import myCardsLogo from './assets/sidebar-icons/home.png';
 import loginLogo from './assets/sidebar-icons/user.png';
 import downloadLogo from './assets/sidebar-icons/download.png';
 import addCardLogo from './assets/sidebar-icons/add.png';
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import {Outlet, useNavigate} from "react-router-dom";
 import deadStreakIcon from './assets/progression-icons/dead_streak_icon.png';
 import aliveStreakIcon from './assets/progression-icons/streak_icon.png';
@@ -96,6 +96,9 @@ function Navbar() {
             });
     }
 
+
+    const leaderboardRef = useRef(null);
+
     useEffect(() => {
         getData("get/userdata").then((response) => {
 
@@ -107,8 +110,10 @@ function Navbar() {
                 const users = [];
                 const competitors = response["competitors"];
 
-                console.log(competitors);
-                const leaderboardElement = ReactDOM.createRoot(document.querySelector('.leaderboard-scrollable'));
+                const leaderboardElement = document.querySelector('.leaderboard-scrollable');
+                if (leaderboardElement && !leaderboardRef.current) {
+                    leaderboardRef.current = ReactDOM.createRoot(leaderboardElement);
+                }
 
                 for (let i = 0; i < competitors.length; i++) {
                     let competitor = competitors[i];
@@ -123,13 +128,10 @@ function Navbar() {
                     );
                     users.push(competitorElement);
                 }
-                leaderboardElement.render(<>{users}</>);
+                leaderboardRef.current.render(<>{users}</>);
             });
 
             getData("get/daily_missions").then((response) => {
-
-                console.log(response)
-
                 const mission = response["missions"][0];
                 const missionType = mission["type"];
                 const maxAmount = mission["amount"];

@@ -26,6 +26,7 @@
     transform: scale(1.5) translateY(-10%);
     font-weight: 400;
     animation: pageReveal 0.2s;
+    transition: 2s ;
 }
 
 .add-card-input {
@@ -45,7 +46,7 @@
     min-height: 2em;
     max-height: 5em;
     scrollbar-width: none;
-    transition: transform 0.2s;
+    transition: transform 0.2s ;
 }
 
 .add-card-input:focus {

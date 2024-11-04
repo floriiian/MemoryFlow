@@ -50,7 +50,7 @@ function Login() {
             })
                 .then(response => {
                     console.log("Success Response:", response);
-                    navigate("/");
+                    navigate("/my_cards");
                 })
                 .catch(error => {
                     console.error("Error Status Code:", error.status);

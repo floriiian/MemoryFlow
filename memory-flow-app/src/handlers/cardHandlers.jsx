@@ -1,4 +1,4 @@
-import {getRequest} from "../api/Requests.jsx";
+import {getRequest, postRequest} from "../api/Requests.jsx";
 
 export const checkFlashcard = (question, solution, category) => {
 
@@ -21,6 +21,19 @@ export const checkFlashcard = (question, solution, category) => {
 
 export function getData(path) {
     return getRequest(path)
+        .then(response => {
+            return response;
+        })
+        .catch(error => {
+            console.error("Error Status Code:", error.status);
+            console.error("Error Message:", error.message);
+            throw new Error(error.message);
+        });
+}
+
+
+export function requestCards(path, data) {
+    return postRequest(path, data)
         .then(response => {
             return response;
         })

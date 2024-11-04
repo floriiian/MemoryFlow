@@ -6,8 +6,9 @@ import Homepage from './routes/Homepage.jsx';
 import Login from './routes/Login.jsx';
 import Navbar from "./Navbar.jsx";
 import Register from "./routes/Register.jsx";
-import MyCards from "./routes/MyCards.jsx";
+import CardCategories from "./routes/CardCategories.jsx";
 import AddCards from "./routes/AddCards.jsx";
+import Cards from "./routes/Cards.jsx";
 
 
 const router = createBrowserRouter([
@@ -17,13 +18,22 @@ const router = createBrowserRouter([
     },
     {
         path: "/my_cards",
-        element: <MyCards/>,
+        element: <CardCategories />,
         children: [
             {
                 index: true,
                 element: <Navbar />
-            }
+            },
+            {
+                path: ":category",
+                element: <Cards />,
+
+            },
         ]
+    },
+    {
+        path: "/my_cards/:category",
+        element: <Cards/>,
     },
     {
         path: "/add_cards",

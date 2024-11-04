@@ -30,11 +30,10 @@ export const postRequest = async (endpoint, data) => {
     });
 };
 
-export const getRequest = async (endpoint, data) => {
+export const getRequest = async (endpoint) => {
 
     return receiveData(endpoint, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
     });
 };

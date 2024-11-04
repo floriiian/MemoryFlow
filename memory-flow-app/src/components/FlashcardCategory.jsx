@@ -2,10 +2,11 @@ import React from "react";
 import AddIcon from '../assets/sidebar-icons/add.png'
 
 const FlashCardCategory = (props) => {
+
     return (
         <div
             key={props.name}
-            className="flashCardCategory"
+            className={props.card_type === "flashcard" ? "flashcard" : "flashCardCategory"}
             onClick={() => props.type === "add" ? props.switchToCategoryState() :  props.setCategory(props.name)}
         >
             <div className="inner-flashcard">

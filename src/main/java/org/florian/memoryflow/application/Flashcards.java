@@ -4,11 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.http.Context;
+import kotlin.reflect.jvm.internal.impl.util.ArrayMap;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.florian.memoryflow.account.Login;
 import org.florian.memoryflow.api.responses.CardCategoriesResponse;
+import org.florian.memoryflow.api.responses.CardsResponse;
 import org.florian.memoryflow.api.responses.ErrorResponse;
 import org.florian.memoryflow.db.Database;
 
@@ -31,14 +33,27 @@ public class Flashcards {
 
     }
 
-    public void getFlashCardsByCategory(String user_id, String category) {
+    public static void getFlashCardsByCategory(boolean validSession, JsonNode decodedJson, Context ctx) throws Exception{
+
+        if (!validSession) {
+            returnFailedRequest(ctx, "You're not logged in.");
+            return;
+        }
+
+        String category = decodedJson.get("category").asText();
+
+        String user_id = Login.getAccountIDByToken(ctx.cookie("sessionToken"));
         HashMap<String, String> map = db.getFlashCardsByOwner(user_id, category);
 
+        HashMap<String, String> cards = new HashMap<>();
+
         if (map != null) {
-            map.forEach((key, value) -> {
-                System.out.println("Key=" + key + ", Value=" + value);
-            });
+            cards.putAll(map);
         }
+        ctx.status(200);
+        ctx.contentType("application/json");
+        ctx.result(OBJECT_MAPPER.writeValueAsString(new CardsResponse(cards)));
+
     }
 
     private static String getCardFromUserId(String user_id, String question) {

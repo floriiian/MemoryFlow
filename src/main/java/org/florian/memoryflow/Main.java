@@ -49,14 +49,17 @@ public class Main {
         app.post("/login", ctx -> handlePostRequest("/login", ctx));
         app.post("/complete", ctx -> handlePostRequest("/complete", ctx));
         app.post("/add_card", ctx -> handlePostRequest("/add_card", ctx));
+        app.post("/cards", ctx ->  handlePostRequest("/cards", ctx));
 
         app.get("/get/userdata", ctx -> handleGetRequest("/get/userdata", ctx));
         app.get("/get/leaderboard", ctx -> handleGetRequest("/get/leaderboard", ctx));
         app.get("/get/daily_missions", ctx -> handleGetRequest("/get/daily_missions", ctx));
         app.get("get/card_categories", ctx -> handleGetRequest("/get/card_categories", ctx));
+
     }
 
     private static void handleGetRequest(String path, Context ctx) throws Exception {
+
         boolean isValidSession = verifySession(ctx);
         if (!isValidSession) {
             ctx.status(500);
@@ -98,6 +101,9 @@ public class Main {
                 break;
             case "/add_card":
                 Flashcards.handleFlashcardAdd(isValidSession, jsonData, ctx);
+            case "/cards":
+                Flashcards.getFlashCardsByCategory(isValidSession, jsonData, ctx);
+                break;
         }
     }
 

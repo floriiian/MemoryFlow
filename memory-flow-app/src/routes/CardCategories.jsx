@@ -1,79 +1,61 @@
-import {Outlet, useNavigate,  useSearchParams} from "react-router-dom";
-import '../index.css'
-import '../MyCards.css'
-import React, {useEffect, useRef, useState} from "react";
-import ReactDOM from "react-dom/client";
-import {getData} from "../handlers/cardHandlers.jsx";
+import {Outlet, useLocation, useNavigate} from "react-router-dom";
+import '../index.css';
+import '../MyCards.css';
+import React, { useEffect, useState } from "react";
+import { getData } from "../handlers/cardHandlers.jsx";
 import FlashCardCategory from "../components/FlashcardCategory.jsx";
 
-
 function CardCategories() {
-
+    const location = useLocation(); // To check current location
     const navigate = useNavigate();
-
-    const flashcardContainerRef = useRef(null);
-
-    function setCategory(category) {
-        formData.category = category;
-        if (currentFormState === 0) {
-            setFormState(1)
-            setInstructionText("Name and describe your Flashcard.")
-        }
-    }
-
-    const [searchParams] = useSearchParams();
+    const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-
-
-        const flashcardContainerEl = document.querySelector('.flashcardsContainer');
-        if (flashcardContainerEl && !flashcardContainerRef.current) {
-            flashcardContainerRef.current = ReactDOM.createRoot(flashcardContainerEl);
-        }
-
-        const cards = [];
-        const categoryCards = {}
-
-        getData("get/card_categories").then((response) => {
-            const categories = response["categories"];
-
-            let currentEntry = 0;
-            for (const [category, amount] of Object.entries(categories)) {
-                categoryCards[currentEntry] = {name: category, amount: amount};
-                currentEntry++;
+        const fetchCategories = async () => {
+            setLoading(true);
+            try {
+                const response = await getData("get/card_categories");
+                const categoriesList = Object.entries(response.categories).map(([name, amount]) => ({
+                    name,
+                    amount,
+                }));
+                setCategories(categoriesList);
+            } catch (error) {
+                console.error("Error fetching categories:", error);
+            } finally {
+                setLoading(false);
             }
-        }).then(
-            (response) => {
-                Object.entries(categoryCards).forEach(([key, category]) => {
-                    let categoryElement = (
-                        <FlashCardCategory
-                            key={key}
-                            card_type={"flashcard"}
-                            name={category.name}
-                            amount={category.amount}
-                            type={category.type}
-                            setCategory={setCategory}
-                        />
-                    );
-                    cards.push(categoryElement);
-                });
-                flashcardContainerRef.current.render(<>{cards}</>);
-            }
-        )
-    })
+        };
+
+        fetchCategories();
+    }, []);
 
     return (
-        <>
-            <div className={"baseBody"}>
-                <div className={"flashcardsContainer"}>
+        <div className="baseBody">
+            {location.pathname === "/my_cards" && ( // Render categories only on /my_cards route
+                <div className="flashcardsContainer">
+                    {loading ? (
+                        <p>Loading...</p>
+                    ) : (
+                        categories.map((category, index) => (
+                            <FlashCardCategory
+                                key={index}
+                                card_type={"flashcard"}
+                                name={category.name}
+                                amount={category.amount}
+                                type={"redirect"}
+                                redirect={(cat) => navigate(`${cat}`)} // Redirect function
+                            />
+                        ))
+                    )}
                 </div>
-                <main>
-                    <Outlet/>
-                </main>
-            </div>
-        </>
+            )}
+            <main>
+                <Outlet /> {/* This will render Cards when navigating to /my_cards/:category */}
+            </main>
+        </div>
     );
 }
 
 export default CardCategories;
-

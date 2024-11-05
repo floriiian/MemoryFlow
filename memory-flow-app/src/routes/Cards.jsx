@@ -1,75 +1,57 @@
-import {Outlet, useLocation, useNavigate, useParams, useSearchParams} from "react-router-dom";
-import '../index.css'
-import '../MyCards.css'
-import React, {useEffect, useRef, useState} from "react";
-import ReactDOM from "react-dom/client";
-import {getData, requestCards} from "../handlers/cardHandlers.jsx";
-import FlashCardCategory from "../components/FlashcardCategory.jsx";
+import { Outlet, useParams } from "react-router-dom";
+import '../index.css';
+import '../MyCards.css';
+import React, { useEffect, useState } from "react";
+import { requestCards } from "../handlers/cardHandlers.jsx";
+import Flashcard from "../components/Flashcard.jsx";
 import Navbar from "../Navbar.jsx";
-import cardCategories from "./CardCategories.jsx";
-
 
 function Cards() {
-
-    const navigate = useNavigate();
-
-    const flashcardContainerRef = useRef(null);
-
-    function setCategory(category) {
-        formData.category = category;
-        if (currentFormState === 0) {
-            setFormState(1)
-            setInstructionText("Name and describe your Flashcard.")
-        }
-    }
-
     const { category } = useParams();
+    const [flashcards, setFlashcards] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-
-        const cards = [];
-        const categoryCards = {}
-
-        requestCards("cards", {category: category}).then((response) => {
-            console.log(response);
-            const categories = response["categories"];
-
-            let currentEntry = 0;
-            for (const [category, amount] of Object.entries(categories)) {
-                categoryCards[currentEntry] = {name: category, amount: amount};
-                currentEntry++;
+        const fetchCards = async () => {
+            setLoading(true);
+            try {
+                const response = await requestCards("cards", { category });
+                const cards = Object.entries(response.cards).map(([question, answer]) => ({
+                    question,
+                    answer: answer,
+                    type: answer.type,
+                }));
+                setFlashcards(cards);
+            } catch (error) {
+                console.error("Error fetching cards:", error);
+            } finally {
+                setLoading(false);
             }
-        }).then(
-            (response) => {
-                Object.entries(categoryCards).forEach(([key, category]) => {
-                    let categoryElement = (
-                        <FlashCardCategory
-                            key={key}
-                            card_type={"flashcard"}
-                            name={category.name}
-                            amount={category.amount}
-                            type={category.type}
-                            setCategory={setCategory}
-                        />
-                    );
-                    cards.push(categoryElement);
-                });
-                flashcardContainerRef.current.render(<>{cards}</>);
-            }
-        )
-    })
+        };
+
+        fetchCards();
+    }, [category]);
 
     return (
-        <>
-            <div className={"baseBody"}>
-                <div className={"flashcardsContainer"}>
-
-                </div>
-                <Navbar></Navbar>
+        <div className="baseBody">
+            <div className="flashcardsContainer">
+                {loading ? (
+                    <p>Loading...</p>
+                ) : (
+                    flashcards.map((card, index) => (
+                        <Flashcard
+                            key={index}
+                            question={card.question}
+                            answer={card.answer}
+                            editFlashcard={() => console.log("editFlashcard", card.question)}
+                            selectFlashcard={() => console.log("selectFlashcard", card.question)}
+                        />
+                    ))
+                )}
             </div>
-        </>
+            <Navbar />
+        </div>
     );
 }
 
 export default Cards;
-

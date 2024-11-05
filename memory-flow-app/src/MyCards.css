@@ -5,7 +5,7 @@
     grid-template-columns: repeat(2, minmax(0, 22em));
     grid-gap: 2em;
     z-index: 10;
-    animation: cardsAppear 0.5s ease-in;
+    animation: cardsAppear 0.3s ease-in;
     max-width: 90vw;
     max-height: 85vh;
     padding: 1em;
@@ -16,9 +16,6 @@
 .flashcardsContainer::-webkit-scrollbar {
     display: none;
 }
-
-
-
 
 /* @media (max-width: 1450px) {
     .flashcardsContainer {
@@ -42,19 +39,21 @@
 .flashcard:hover{
     background: rgb(62, 62, 98);
     cursor: pointer;
+    box-shadow: 0 1px 1px 3px #6786c3;
+    transition: 0.2s;
 }
 
 .inner-flashcard {
     border-radius: 10px;
     width: 15em;
-    max-width: 15em;
     text-align: left;
 }
 
 .flashcard-button {
-    margin-top: 1em;
+    position: fixed;
     border-radius: 10px;
-    width: 9em;
+    margin-top: 1em;
+    width: 2.5em;
     height: 2.5em;
     border: none;
     font-weight: bold;
@@ -64,9 +63,14 @@
     background: rgb(91, 92, 138);
     font-size: 16px;
 }
+.flashcard-button img{
+    width: 1.4em;
+    pointer-events: none;
+}
+
+
 .flashcard-button:hover{
     background: rgb(100, 101, 153);
-
     cursor: pointer;
 }
 
@@ -84,18 +88,29 @@
 
 .inner-flashcard p {
     font-weight: bold;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    max-width: 20em;
 }
 
-.flashcard-category{
-    margin-top: 0.2em;
-    font-size: 2em;
+.flashcard-category {
+    font-size: 1.4em;
     color: #dcdcdc;
+    max-height: 1em;
+    overflow: hidden;
 }
-.flashcard-amount{
-    margin-top: -1.5em;
-    margin-bottom: 2em;
+
+.flashcard-amount {
     font-size: 1.1em;
     color: #9ba9d5;
+    max-height: 1em;
+    margin-top: 0.5em;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.flashcard-amount::-webkit-scrollbar{
+    display: none;
 }
 
 @keyframes cardsAppear {

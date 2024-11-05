@@ -2,6 +2,8 @@ import {getRequest, postRequest} from "../api/Requests.jsx";
 
 export const checkFlashcard = (question, solution, category) => {
 
+    console.log(question, solution, category)
+
     const isWhitespaceString = str => !str.replace(/\s/g, '').length
 
     if (category === undefined || category.length === 0  || isWhitespaceString(category)) {

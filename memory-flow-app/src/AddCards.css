@@ -106,7 +106,7 @@
     font-weight: bold;
 }
 
-.flashcard-category {
+.flashcard-c-category {
     margin-top: 0.2em;
     width: 9em;
     font-size: 2em;
@@ -114,7 +114,7 @@
 
 }
 
-.flashcard-amount {
+.flashcard-c-amount {
     margin-top: -1.5em;
     margin-bottom: 2em;
     font-size: 1.1em;

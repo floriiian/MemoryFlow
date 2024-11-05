@@ -65,7 +65,7 @@ function AddCards() {
             }
             categoryCards[currentEntry] = {name: "", type: "add"};
         }).then(
-            (response) => {
+            () => {
                 Object.entries(categoryCards).forEach(([key, category]) => {
                     let categoryElement = (
                         <FlashCardCategory
@@ -75,6 +75,7 @@ function AddCards() {
                             type={category.type}
                             setCategory={setCategory}
                             switchToCategoryState={switchToCategoryState}
+                            redirect={navigate}
                         />
                     );
                     cards.push(categoryElement);

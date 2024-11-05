@@ -219,22 +219,18 @@ public class Database {
     @Nullable
     private HashMap<String, String> getStringStringHashMap(PreparedStatement preparedStmt) throws SQLException {
         try (ResultSet results = preparedStmt.executeQuery()) {
-            if (!results.next()) {
-                return null;
-            } else {
-                HashMap<String, String> resultList = new HashMap<>();
-                ResultSetMetaData metadata = results.getMetaData();
-                int columnCount = metadata.getColumnCount();
+            HashMap<String, String> resultList = new HashMap<>();
+            ResultSetMetaData metadata = results.getMetaData();
 
-                while (results.next()) {
-                    for (int i = 1; i <= columnCount; i += 2) {
-                        String key = results.getString(i);
-                        String value = results.getString(i + 1);
-                        resultList.put(key, value);
-                    }
+            int columnCount = metadata.getColumnCount();
+            while (results.next()) {
+                for (int i = 1; i <= columnCount; i += 2) {
+                    String key = results.getString(i);
+                    String value = results.getString(i + 1);
+                    resultList.put(key, value);
                 }
-                return resultList;
             }
+            return resultList.isEmpty() ? null : resultList;
         }
     }
 

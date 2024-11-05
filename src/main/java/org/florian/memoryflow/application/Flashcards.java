@@ -45,14 +45,14 @@ public class Flashcards {
         String user_id = Login.getAccountIDByToken(ctx.cookie("sessionToken"));
         HashMap<String, String> map = db.getFlashCardsByOwner(user_id, category);
 
-        HashMap<String, String> cards = new HashMap<>();
-
         if (map != null) {
-            cards.putAll(map);
+            HashMap<String, String> cards = new HashMap<>(map);
+            ctx.status(200);
+            ctx.contentType("application/json");
+            ctx.result(OBJECT_MAPPER.writeValueAsString(new CardsResponse(cards)));
+        } else {
+            returnFailedRequest(ctx, "No cards found for category " + category);
         }
-        ctx.status(200);
-        ctx.contentType("application/json");
-        ctx.result(OBJECT_MAPPER.writeValueAsString(new CardsResponse(cards)));
 
     }
 

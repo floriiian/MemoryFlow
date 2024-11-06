@@ -4,12 +4,13 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.http.Context;
-import kotlin.reflect.jvm.internal.impl.util.ArrayMap;
+
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.florian.memoryflow.account.Login;
 import org.florian.memoryflow.api.responses.CardCategoriesResponse;
+import org.florian.memoryflow.api.responses.CardsDataResponse;
 import org.florian.memoryflow.api.responses.CardsResponse;
 import org.florian.memoryflow.api.responses.ErrorResponse;
 import org.florian.memoryflow.db.Database;
@@ -25,7 +26,7 @@ public class Flashcards {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
     public static void getFlashCardCategories(Context ctx) throws Exception {
-        String user_id =  Login.getAccountIDByToken(ctx.cookie("sessionToken"));
+        String user_id = Login.getAccountIDByToken(ctx.cookie("sessionToken"));
         HashMap<String, Integer> values = db.getCategoriesByOwner(user_id);
         ctx.status(200);
         ctx.contentType("application/json");
@@ -33,27 +34,54 @@ public class Flashcards {
 
     }
 
-    public static void getFlashCardsByCategory(boolean validSession, JsonNode decodedJson, Context ctx) throws Exception{
-
-        if (!validSession) {
-            returnFailedRequest(ctx, "You're not logged in.");
-            return;
-        }
-
+    public static void getFlashCardsByCategory(boolean validSession, JsonNode decodedJson, Context ctx) throws Exception {
+        checkSession(validSession, ctx);
         String category = decodedJson.get("category").asText();
-
         String user_id = Login.getAccountIDByToken(ctx.cookie("sessionToken"));
-        HashMap<String, String> map = db.getFlashCardsByOwner(user_id, category);
+        HashMap<String, String[]> map = db.getFlashCardsByOwner(user_id, category);
 
         if (map != null) {
-            HashMap<String, String> cards = new HashMap<>(map);
+            HashMap<String, String[]> cards = new HashMap<>(map);
             ctx.status(200);
             ctx.contentType("application/json");
             ctx.result(OBJECT_MAPPER.writeValueAsString(new CardsResponse(cards)));
         } else {
             returnFailedRequest(ctx, "No cards found for category " + category);
         }
+    }
 
+    public static void editFlashcard(boolean validSession, JsonNode decodedJson, Context ctx) throws Exception {
+        checkSession(validSession, ctx);
+        String user_id = Login.getAccountIDByToken(ctx.cookie("sessionToken"));
+        String card_id = decodedJson.get("card_id").asText();
+
+        if(checkFlashcardOwner(user_id, card_id)) {
+
+            String question = decodedJson.get("question").asText();
+            String solution = decodedJson.get("solution").asText();
+            String category = decodedJson.get("category").asText();
+
+            db.updateFlashcard(card_id, question, solution, category);
+            ctx.status(200);
+        } else {
+            returnFailedRequest(ctx, "You can't edit another users card.");
+        }
+    }
+
+    public static void getFlashCardInfo(boolean validSession, JsonNode decodedJson, Context ctx) throws Exception {
+        checkSession(validSession, ctx);
+
+        String user_id = Login.getAccountIDByToken(ctx.cookie("sessionToken"));
+        String card_id = decodedJson.get("card_id").asText();
+
+        if(checkFlashcardOwner(user_id, card_id)) {
+            ArrayList<String> cardData = db.getCardData(card_id);
+            ctx.contentType("application/json");
+            ctx.result(OBJECT_MAPPER.writeValueAsString(new CardsDataResponse(
+                    cardData.get(0),cardData.get(1), cardData.get(2))));
+        } else {
+            returnFailedRequest(ctx, "You can't edit another users card.");
+        }
     }
 
     private static String getCardFromUserId(String user_id, String question) {
@@ -66,10 +94,7 @@ public class Flashcards {
 
     public static void handleFlashcardAdd(boolean validSession, JsonNode decodedJson, Context ctx) throws Exception {
 
-        if (!validSession) {
-            returnFailedRequest(ctx, "You're not logged in.");
-            return;
-        }
+        checkSession(validSession, ctx);
 
         String solution = decodedJson.get("solution").asText();
         String question = decodedJson.get("question").asText();
@@ -94,12 +119,6 @@ public class Flashcards {
                 ctx.status(200);
             }
         }
-    }
-
-    private static void returnFailedRequest(Context ctx, String input) throws JsonProcessingException {
-        ctx.status(500);
-        ctx.contentType("application/json");
-        ctx.result(OBJECT_MAPPER.writeValueAsString(new ErrorResponse(input)));
     }
 
     public static void addNewFlashcard(String user_id, String question, String solution, String category) {
@@ -141,7 +160,29 @@ public class Flashcards {
         }
     }
 
+
+    private static boolean checkFlashcardOwner(String user_id, String card_id) {
+        if(card_id != null){
+            String real_owner =  db.getValue("flashcards", "user_id",  "card_id", card_id);
+            return real_owner.equals(user_id);
+        } else {
+            return false;
+        }
+    }
+
     private void updateField(String column, String value, String card_id) {
         db.updateValues("flashcards", column, "card_id", card_id, value);
+    }
+
+    private static void checkSession(boolean validSession, Context ctx) throws Exception {
+        if (!validSession) {
+            returnFailedRequest(ctx, "You're not logged in.");
+        }
+    }
+
+    private static void returnFailedRequest(Context ctx, String input) throws JsonProcessingException {
+        ctx.status(500);
+        ctx.contentType("application/json");
+        ctx.result(OBJECT_MAPPER.writeValueAsString(new ErrorResponse(input)));
     }
 }

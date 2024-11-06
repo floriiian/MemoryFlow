@@ -149,6 +149,17 @@ public class Database {
         }
     }
 
+    public ArrayList<String> getCardData(String card_id) throws SQLException {
+        String sql = "SELECT question, solution,category FROM flashcards WHERE card_id = ?";
+        try (PreparedStatement preparedStmt = CONNECTION.prepareStatement(sql)) {
+            preparedStmt.setString(1, card_id);
+            return getStrings(preparedStmt);
+        } catch (Exception e) {
+            LOGGER.debug(e);
+            return null;
+        }
+    }
+
     private ArrayList<String> getStrings(PreparedStatement preparedStmt) throws SQLException {
         try (ResultSet results = preparedStmt.executeQuery()) {
             if (!results.next()) {
@@ -191,13 +202,13 @@ public class Database {
         }
     }
 
-    public HashMap<String, String> getFlashCardsByOwner(String user_id, String category) {
-        String sql = "SELECT question, solution FROM flashcards WHERE user_id = ? AND category = ?";
+    public HashMap<String, String[]> getFlashCardsByOwner(String user_id, String category) {
+        String sql = "SELECT card_id, question, solution FROM flashcards WHERE user_id = ? AND category = ?";
 
         try (PreparedStatement preparedStmt = CONNECTION.prepareStatement(sql)) {
             preparedStmt.setString(1, user_id);
             preparedStmt.setString(2, category);
-            return getStringStringHashMap(preparedStmt);
+            return getStringArrayMap(preparedStmt);
         } catch (Exception e) {
             LOGGER.debug(e);
             return null;
@@ -217,17 +228,18 @@ public class Database {
     }
 
     @Nullable
-    private HashMap<String, String> getStringStringHashMap(PreparedStatement preparedStmt) throws SQLException {
+    private HashMap<String, String[]> getStringArrayMap(PreparedStatement preparedStmt) throws SQLException {
         try (ResultSet results = preparedStmt.executeQuery()) {
-            HashMap<String, String> resultList = new HashMap<>();
+            HashMap<String, String[]> resultList = new HashMap<>();
             ResultSetMetaData metadata = results.getMetaData();
 
             int columnCount = metadata.getColumnCount();
             while (results.next()) {
-                for (int i = 1; i <= columnCount; i += 2) {
-                    String key = results.getString(i);
-                    String value = results.getString(i + 1);
-                    resultList.put(key, value);
+                for (int i = 1; i <= columnCount; i += 3) {
+                    String card_id = results.getString(i);
+                    String question = results.getString(i + 1);
+                    String answer = results.getString(i + 2);
+                    resultList.put(card_id, new String[]{question, answer});
                 }
             }
             return resultList.isEmpty() ? null : resultList;
@@ -252,6 +264,19 @@ public class Database {
     public void updateValues(String table, String column, String where, String whereValue, Object value) {
         String sql = "UPDATE " + table + " SET " + column + " = ? WHERE " + where + "=" + whereValue;
         executeStatement(value, sql);
+    }
+
+    public void updateFlashcard(String card_id, String question, String solution, String category) {
+        String sql = "UPDATE flashcards SET question = ?, solution = ?, category = ? WHERE card_id = ?";
+        try (PreparedStatement stmt = CONNECTION.prepareStatement(sql)) {
+            stmt.setString(1, question);
+            stmt.setString(2, solution);
+            stmt.setString(3, category);
+            stmt.setString(4, card_id);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.debug(e);
+        }
     }
 
     public void updateIncrementedValue(String table, String column, String where, String whereValue, int value) {

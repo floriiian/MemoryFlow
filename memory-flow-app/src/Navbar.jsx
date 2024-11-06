@@ -21,10 +21,9 @@ function Navbar() {
     const [selectedButton, setSelectedButton] = useState(null);
 
     const currentURL = window.location.href;
-    const currentPath = currentURL.substring(currentURL.lastIndexOf('/') + 1);
 
     useEffect(() => {
-        setSelectedButton(currentPath);
+        setSelectedButton(currentURL);
     }, []);
 
     function redirectToPage(page) {
@@ -155,28 +154,28 @@ function Navbar() {
                         <li style={{pointerEvents: 'none'}}>
                             <div className={"titleLogo"}>MemoryFlow</div>
                         </li>
-                        <li className={selectedButton === "my_cards" ? "active" : ""}>
+                        <li className={selectedButton?.includes("my_cards")  ? "active" : ""}>
                             <i></i>
                             <div className={"icon"} onClick={() => redirectToPage("my_cards")}>
                                 <img alt="Download cards logo" src={myCardsLogo}/>
                                 <span>My cards</span>
                             </div>
                         </li>
-                        <li className={selectedButton === "add_cards" ? "active" : ""}>
+                        <li className={selectedButton?.includes("add_card") ? "active" : ""}>
                             <i></i>
-                            <div className={"icon"} onClick={() => redirectToPage("add_cards")}>
+                            <div className={"icon"} onClick={() => redirectToPage("add_card")}>
                                 <img alt="Add cards logo" src={addCardLogo}/>
-                                <span>Add cards</span>
+                                <span>Add card</span>
                             </div>
                         </li>
-                        <li className={selectedButton === "download_cards" ? "active" : ""}>
+                        <li className={selectedButton?.includes("download_cards") ? "active" : ""}>
                             <i></i>
                             <div className={"icon"} onClick={() => redirectToPage("download_cards")}>
                                 <img alt="Download cards logo" src={downloadLogo}/>
                                 <span>Get Cards</span>
                             </div>
                         </li>
-                        <li className={selectedButton === "login" ? "active" : ""}>
+                        <li className={selectedButton?.includes("login") ? "active" : ""}>
                             <i></i>
                             <div className={"icon"} onClick={() => redirectToPage("login")}>
                                 <img alt="Download cards logo" src={loginLogo}/>

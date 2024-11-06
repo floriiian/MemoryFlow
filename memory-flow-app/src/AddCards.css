@@ -138,6 +138,16 @@
     outline: none;
 }
 
+.add-cards-button.delete{
+    margin-top: 0;
+    background-color: #bf2a53;
+    box-shadow: 0 0.3em #801c36;
+}
+
+.add-cards-button.delete:hover{
+    background-color: #d1305b;
+}
+
 .add-cards-button:hover {
     background-color: #7b8df9;
     outline: none;
@@ -178,6 +188,11 @@
     animation: addCardsAnimation 0.3s ease-in;
 }
 
+.add-cards-icon.animated-edit{
+    width: 70%;
+    transform: scaleX(-1) translateX(30%) rotate(-20deg);
+}
+
 
 @keyframes addCardsAnimation {
     0% {
@@ -196,3 +211,5 @@
         transform: translateX(-50%)  rotate(0deg);
     }
 }
+
+

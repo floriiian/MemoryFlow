@@ -57,12 +57,17 @@
     height: 2.5em;
     border: none;
     font-weight: bold;
-    z-index: 5;
+    z-index: 11;
     color: #dfdbdb;
     box-shadow: 0 0.01em 0 0.2em #7276a4;
     background: rgb(91, 92, 138);
     font-size: 16px;
 }
+
+.flashcard-button.delete{
+    margin-left: 50px;
+}
+
 .flashcard-button img{
     width: 1.4em;
     pointer-events: none;

@@ -1,8 +1,7 @@
 import {getRequest, postRequest} from "../api/Requests.jsx";
+import {showFormHint} from "./accountHandlers.jsx";
 
 export const checkFlashcard = (question, solution, category) => {
-
-    console.log(question, solution, category)
 
     const isWhitespaceString = str => !str.replace(/\s/g, '').length
 

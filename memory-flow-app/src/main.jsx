@@ -9,6 +9,7 @@ import Register from "./routes/Register.jsx";
 import CardCategories from "./routes/CardCategories.jsx";
 import AddCards from "./routes/AddCards.jsx";
 import Cards from "./routes/Cards.jsx";
+import EditCard from "./routes/EditCard.jsx";
 
 
 const router = createBrowserRouter([
@@ -36,8 +37,12 @@ const router = createBrowserRouter([
         element: <Cards/>,
     },
     {
-        path: "/add_cards",
+        path: "/add_card",
         element: <AddCards/>,
+    },
+    {
+        path: "/edit_card/:card_id",
+        element: <EditCard/>,
         children: [
             {
                 index: true,

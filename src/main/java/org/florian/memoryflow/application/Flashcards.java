@@ -34,7 +34,7 @@ public class Flashcards {
 
     }
 
-    public static void getFlashCardsByCategory(boolean validSession, JsonNode decodedJson, Context ctx) throws Exception {
+    public static void getFlashcardsByCategory(boolean validSession, JsonNode decodedJson, Context ctx) throws Exception {
         checkSession(validSession, ctx);
         String category = decodedJson.get("category").asText();
         String user_id = Login.getAccountIDByToken(ctx.cookie("sessionToken"));
@@ -68,7 +68,7 @@ public class Flashcards {
         }
     }
 
-    public static void getFlashCardInfo(boolean validSession, JsonNode decodedJson, Context ctx) throws Exception {
+    public static void getFlashcardInfo(boolean validSession, JsonNode decodedJson, Context ctx) throws Exception {
         checkSession(validSession, ctx);
 
         String user_id = Login.getAccountIDByToken(ctx.cookie("sessionToken"));
@@ -130,14 +130,24 @@ public class Flashcards {
         );
     }
 
-    public void removeFlashcard(String user_id, Integer card_id) {
+    public static void deleteFlashcard(boolean validSession, JsonNode jsonData, Context ctx) throws Exception {
+
+        checkSession(validSession, ctx);
+
+        String card_id = jsonData.get("card_id").asText();
+        String user_id = Login.getAccountIDByToken(ctx.cookie("sessionToken"));
+        if(card_id == null) {
+            returnFailedRequest(ctx, "No card id found.");
+        }
+
         String cardOwner = db.getValue("flashcards", "user_id", "card_id", card_id);
 
         if (!cardOwner.equals(user_id)) {
-            LOGGER.debug("{} tried to remove card with id {}.", user_id, card_id);
+            returnFailedRequest(ctx, "You don't own this card.");
         } else {
+            LOGGER.debug(card_id);
             db.deleteValue("flashcards", "card_id", card_id);
-            LOGGER.debug("Successfully deleted: {}.", card_id);
+            ctx.status(200);
         }
     }
 

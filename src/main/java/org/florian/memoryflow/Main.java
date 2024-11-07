@@ -1,6 +1,5 @@
 package org.florian.memoryflow;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.Javalin;
@@ -53,33 +52,15 @@ public class Main {
         app.post("/cards", ctx ->  handlePostRequest("/cards", ctx));
         app.post("/card_info", ctx ->  handlePostRequest("/card_info", ctx));
         app.post("/edit_card", ctx ->  handlePostRequest("/edit_card", ctx));
+        app.post("delete/card", ctx -> handlePostRequest("/delete/card", ctx));
 
         app.get("/get/userdata", ctx -> handleGetRequest("/get/userdata", ctx));
         app.get("/get/leaderboard", ctx -> handleGetRequest("/get/leaderboard", ctx));
         app.get("/get/daily_missions", ctx -> handleGetRequest("/get/daily_missions", ctx));
         app.get("/get/card_categories", ctx -> handleGetRequest("/get/card_categories", ctx));
 
-        app.delete("delete/card", ctx -> handleDeleteRequest("delete/card", ctx));
-        app.delete("delete/account", ctx -> handleDeleteRequest("delete/account", ctx));
-
     }
 
-    private static void handleDeleteRequest(String path, Context ctx) throws Exception {
-
-        boolean isValidSession = verifySession(ctx);
-        if (!isValidSession) {
-            ctx.status(500);
-            ctx.contentType("application/json");
-            ctx.result(OBJECT_MAPPER.writeValueAsString(
-                    new ErrorResponse("Not logged in.")));
-        }
-
-        switch(path) {
-            case "/delete/card":
-                LOGGER.debug("Deleting card");
-                break;
-        }
-    }
 
     private static void handleGetRequest(String path, Context ctx) throws Exception {
 
@@ -125,13 +106,16 @@ public class Main {
             case "/add_card":
                 Flashcards.handleFlashcardAdd(isValidSession, jsonData, ctx);
             case "/cards":
-                Flashcards.getFlashCardsByCategory(isValidSession, jsonData, ctx);
+                Flashcards.getFlashcardsByCategory(isValidSession, jsonData, ctx);
                 break;
             case "/edit_card":
                 Flashcards.editFlashcard(isValidSession, jsonData, ctx);
                 break;
             case "/card_info":
-                Flashcards.getFlashCardInfo(isValidSession, jsonData, ctx);
+                Flashcards.getFlashcardInfo(isValidSession, jsonData, ctx);
+                break;
+            case "/delete/card":
+                Flashcards.deleteFlashcard(isValidSession, jsonData, ctx);
                 break;
         }
     }

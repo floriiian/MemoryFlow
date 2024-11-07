@@ -14,6 +14,8 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import LeaderboardUser from "./components/LeaderboardUser.jsx";
 import {getRequest} from "./api/Requests.jsx";
+import {couch} from "globals";
+import {getData} from "./handlers/cardHandlers.jsx";
 
 function Navbar() {
 
@@ -81,20 +83,6 @@ function Navbar() {
             setLeaderboardTime("Reset")
         }
     }, 1000);
-
-
-    function getData(path) {
-        return getRequest(path)
-            .then(response => {
-                return response;
-            })
-            .catch(error => {
-                console.error("Error Status Code:", error.status);
-                console.error("Error Message:", error.message);
-                throw new Error(error.message);
-            });
-    }
-
 
     const leaderboardRef = useRef(null);
 
@@ -215,6 +203,7 @@ function Navbar() {
                     </div>
                 </div>
             </div>
+
         </>
     );
 }

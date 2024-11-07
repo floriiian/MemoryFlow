@@ -1,4 +1,4 @@
-import {Outlet, useLocation, useNavigate} from "react-router-dom";
+import {Link, Outlet, useLocation, useNavigate} from "react-router-dom";
 import '../index.css';
 import '../MyCards.css';
 import React, { useEffect, useState } from "react";
@@ -6,12 +6,14 @@ import { getData } from "../handlers/cardHandlers.jsx";
 import FlashCardCategory from "../components/FlashcardCategory.jsx";
 
 function CardCategories() {
-    const location = useLocation(); // To check current location
+    const location = useLocation();
     const navigate = useNavigate();
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [redirectLinkVisible, showRedirectLink] = useState(false);
 
-    useEffect(() => {
+    function getCategories() {
         const fetchCategories = async () => {
             setLoading(true);
             try {
@@ -21,15 +23,24 @@ function CardCategories() {
                     amount,
                 }));
                 setCategories(categoriesList);
+                if(categoriesList.length === 0) {
+                    setErrorMessage("You don't have any cards yet,");
+                    showRedirectLink(true);
+                }
             } catch (error) {
                 console.error("Error fetching categories:", error);
+                setErrorMessage(error.message);
             } finally {
                 setLoading(false);
             }
         };
-
         fetchCategories();
-    }, []);
+    }
+
+    useEffect(() => {
+        showRedirectLink(false);
+        getCategories()
+    }, [location]);
 
     return (
         <div className="baseBody">
@@ -52,8 +63,13 @@ function CardCategories() {
                 </div>
             )}
             <main>
-                <Outlet /> {/* This will render Cards when navigating to /my_cards/:category */}
+                <Outlet/>
             </main>
+            <p className={"error-message"}>{errorMessage}
+                <Link to="/add_card" style={{opacity: redirectLinkVisible ? 1 : 0}} className={"redirectLink add-cards"}>add some.</Link>
+            </p>
+
+
         </div>
     );
 }

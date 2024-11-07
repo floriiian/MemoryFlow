@@ -9,6 +9,7 @@ import eraserIcon from '../assets/eraser.png'
 import '../Login.css';
 import '../AddCards.css';
 import {checkFlashcard, getData, requestCards} from "../handlers/cardHandlers.jsx";
+import Navbar from "../Navbar.jsx";
 
 function EditCard() {
 

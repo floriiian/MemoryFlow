@@ -1,8 +1,11 @@
 import React from "react";
 import editIcon from '../assets/edit_icon.png'
 import deleteIcon from '../assets/delete.png'
+import {useParams} from "react-router-dom";
 
 const Flashcard = (props) => {
+
+    const {category} = useParams();
 
     return (
         <div
@@ -26,7 +29,7 @@ const Flashcard = (props) => {
                     className={"flashcard-button delete"}
                     onClick={(e) => {
                         e.stopPropagation();
-                        props.deleteFlashcard(props.card_id);
+                        props.deleteFlashcard(props.card_id, category);
                     }}
                 >
                     <img alt="Delete" src={deleteIcon}/>

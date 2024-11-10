@@ -149,8 +149,19 @@ public class Database {
         }
     }
 
-    public ArrayList<String> getCardData(String card_id) throws SQLException {
+    public ArrayList<String> getAllCardData(String card_id) {
         String sql = "SELECT question, solution,category FROM flashcards WHERE card_id = ?";
+        try (PreparedStatement preparedStmt = CONNECTION.prepareStatement(sql)) {
+            preparedStmt.setString(1, card_id);
+            return getStrings(preparedStmt);
+        } catch (Exception e) {
+            LOGGER.debug(e);
+            return null;
+        }
+    }
+
+    public ArrayList<String> getQuestionSolution(String card_id) {
+        String sql = "SELECT question, solution FROM flashcards WHERE card_id = ?";
         try (PreparedStatement preparedStmt = CONNECTION.prepareStatement(sql)) {
             preparedStmt.setString(1, card_id);
             return getStrings(preparedStmt);
@@ -202,7 +213,7 @@ public class Database {
         }
     }
 
-    public HashMap<String, String[]> getFlashCardsByOwner(String user_id, String category) {
+    public HashMap<String, String[]> getFlashCardsByCategory(String user_id, String category) {
         String sql = "SELECT card_id, question, solution FROM flashcards WHERE user_id = ? AND category = ?";
 
         try (PreparedStatement preparedStmt = CONNECTION.prepareStatement(sql)) {
@@ -214,6 +225,25 @@ public class Database {
             return null;
         }
     }
+
+    public ArrayList<Integer> getAllFlashcardIDsFromUser(String user_id) {
+        String sql = "SELECT card_id FROM flashcards WHERE user_id = ?";
+        try (PreparedStatement preparedStmt = CONNECTION.prepareStatement(sql)) {
+            preparedStmt.setString(1, user_id);
+            ResultSet result = preparedStmt.executeQuery();
+
+            ArrayList<Integer> resultMap = new ArrayList<>();
+            while(result.next()){
+                resultMap.add(result.getInt("card_id"));
+            }
+            return resultMap.isEmpty() ? null : resultMap;
+        } catch (Exception e) {
+            LOGGER.debug(e);
+            return null;
+        }
+    }
+
+
 
     public HashMap<String, Integer> getCategoriesByOwner(String user_id) {
         String sql = "SELECT category, COUNT(question) FROM flashcards WHERE user_id = ? GROUP BY category";

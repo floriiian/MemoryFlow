@@ -3,14 +3,12 @@ package org.florian.memoryflow.account;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.http.Context;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+
 import org.florian.memoryflow.api.requests.RegisterRequest;
-import org.florian.memoryflow.api.responses.LoginResponse;
 import org.florian.memoryflow.api.responses.RegisterResponse;
+
 import org.florian.memoryflow.db.Database;
 
-import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.regex.Matcher;
@@ -20,6 +18,7 @@ import java.util.regex.Pattern;
 public class Register {
 
     private static final Pattern USERNAME_REGEX = Pattern.compile("^[A-Za-z]\\w{1,20}$");
+    private static final Pattern EMAIL_REGEX = Pattern.compile( "^[a-zA-Z0-9_+&*-]+(?:\\.[a-zA-Z0-9_+&*-]+)*@(?:[a-zA-Z0-9-]+\\.)+[a-zA-Z]{2,7}$");
     private static final BCryptPasswordEncoder BCRYPT = new BCryptPasswordEncoder();
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     static Database db = Database.getInstance();
@@ -42,14 +41,15 @@ public class Register {
         if (username == null || email == null || password == null) {
             return new Object[]{false, "Invalid Credentials"};
         }
-        Matcher m = USERNAME_REGEX.matcher(username);
-        if (!m.matches() || username.length() > 20 || username.length() < 2) {
+        Matcher usernameMatcher = USERNAME_REGEX.matcher(username);
+        if (!usernameMatcher.matches() || username.length() > 20 || username.length() < 2) {
             return new Object[]{false, "Your username has to between 2 and 20 characters long."};
         }
         if (!isPasswordValid(password)) {
             return new Object[]{false, "Your password needs: an uppercase letter, a lowercase letter, a number, a symbol."};
         }
-        if (!EmailValidator.getInstance().isValid(email)) {
+        Matcher emailMatcher = EMAIL_REGEX.matcher(email);
+        if (!emailMatcher.matches()) {
             return new Object[]{false, "Invalid Email Address"};
         }
         if (db.getValue("accounts", "email", "email", email) == null

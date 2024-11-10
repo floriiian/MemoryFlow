@@ -38,7 +38,7 @@ public class Flashcards {
         checkSession(validSession, ctx);
         String category = decodedJson.get("category").asText();
         String user_id = Login.getAccountIDByToken(ctx.cookie("sessionToken"));
-        HashMap<String, String[]> map = db.getFlashCardsByOwner(user_id, category);
+        HashMap<String, String[]> map = db.getFlashCardsByCategory(user_id, category);
 
         if (map != null) {
             HashMap<String, String[]> cards = new HashMap<>(map);
@@ -75,7 +75,7 @@ public class Flashcards {
         String card_id = decodedJson.get("card_id").asText();
 
         if(checkFlashcardOwner(user_id, card_id)) {
-            ArrayList<String> cardData = db.getCardData(card_id);
+            ArrayList<String> cardData = db.getAllCardData(card_id);
             ctx.contentType("application/json");
             ctx.result(OBJECT_MAPPER.writeValueAsString(new CardsDataResponse(
                     cardData.get(0),cardData.get(1), cardData.get(2))));

@@ -16,6 +16,7 @@ import org.florian.memoryflow.api.responses.ErrorResponse;
 import org.florian.memoryflow.api.responses.RegisterResponse;
 import org.florian.memoryflow.application.Flashcards;
 import org.florian.memoryflow.db.Database;
+import org.florian.memoryflow.db.Redis;
 import org.florian.memoryflow.leaderboard.Leaderboard;
 import org.florian.memoryflow.missions.DailyMissions;
 
@@ -41,9 +42,10 @@ public class Main {
         Javalin app = Javalin.create().start(8888);
 
         db.startDatabase();
-
         final ScheduledFuture<?> leaderboardHandler = scheduler.scheduleAtFixedRate(
                 Leaderboard.getTopTenCompetitors, 0, 60, SECONDS);
+
+        Redis.addFlashcardSession(3, new int[]{34,35});
 
         app.post("/register", ctx -> handlePostRequest("/register", ctx));
         app.post("/login", ctx -> handlePostRequest("/login", ctx));

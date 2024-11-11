@@ -117,6 +117,7 @@ public class Database {
             return null;
         }
     }
+
     public String getValueWith2Conditions(String table, String column, String where, Object value, String where2, Object value2) {
         String sql = "SELECT " + column + " FROM " + table + " WHERE " + where + " = ? AND " + where2 + " = ?";
 
@@ -160,11 +161,16 @@ public class Database {
         }
     }
 
-    public ArrayList<String> getQuestionSolution(String card_id) {
-        String sql = "SELECT question, solution FROM flashcards WHERE card_id = ?";
+    public String getSolution(String card_id) {
+        String sql = "SELECT solution FROM flashcards WHERE card_id = ?";
         try (PreparedStatement preparedStmt = CONNECTION.prepareStatement(sql)) {
             preparedStmt.setString(1, card_id);
-            return getStrings(preparedStmt);
+            ResultSet results = preparedStmt.executeQuery();
+            if (!results.next()) {
+                return null;
+            } else {
+                return results.getString(1);
+            }
         } catch (Exception e) {
             LOGGER.debug(e);
             return null;
@@ -233,7 +239,7 @@ public class Database {
             ResultSet result = preparedStmt.executeQuery();
 
             ArrayList<Integer> resultMap = new ArrayList<>();
-            while(result.next()){
+            while (result.next()) {
                 resultMap.add(result.getInt("card_id"));
             }
             return resultMap.isEmpty() ? null : resultMap;
@@ -242,7 +248,6 @@ public class Database {
             return null;
         }
     }
-
 
 
     public HashMap<String, Integer> getCategoriesByOwner(String user_id) {

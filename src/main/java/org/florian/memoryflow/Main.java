@@ -10,6 +10,7 @@ import org.apache.logging.log4j.Logger;
 import org.florian.memoryflow.account.Login;
 import org.florian.memoryflow.account.Register;
 import org.florian.memoryflow.account.UserData;
+
 import org.florian.memoryflow.api.requests.LoginRequest;
 import org.florian.memoryflow.api.requests.RegisterRequest;
 import org.florian.memoryflow.api.responses.ErrorResponse;
@@ -45,8 +46,6 @@ public class Main {
         final ScheduledFuture<?> leaderboardHandler = scheduler.scheduleAtFixedRate(
                 Leaderboard.getTopTenCompetitors, 0, 60, SECONDS);
 
-        Redis.addFlashcardSession(3, new int[]{34,35});
-
         app.post("/register", ctx -> handlePostRequest("/register", ctx));
         app.post("/login", ctx -> handlePostRequest("/login", ctx));
         app.post("/complete", ctx -> handlePostRequest("/complete", ctx));
@@ -54,7 +53,9 @@ public class Main {
         app.post("/cards", ctx ->  handlePostRequest("/cards", ctx));
         app.post("/card_info", ctx ->  handlePostRequest("/card_info", ctx));
         app.post("/edit_card", ctx ->  handlePostRequest("/edit_card", ctx));
-        app.post("delete/card", ctx -> handlePostRequest("/delete/card", ctx));
+        app.post("/delete/card", ctx -> handlePostRequest("/delete/card", ctx));
+        app.post("/card_session/start", ctx -> handlePostRequest("/card_session/start", ctx));
+        app.post("/card_session/solve", ctx -> handlePostRequest("/card_session/solve", ctx));
 
         app.get("/get/userdata", ctx -> handleGetRequest("/get/userdata", ctx));
         app.get("/get/leaderboard", ctx -> handleGetRequest("/get/leaderboard", ctx));
@@ -118,6 +119,12 @@ public class Main {
                 break;
             case "/delete/card":
                 Flashcards.deleteFlashcard(isValidSession, jsonData, ctx);
+                break;
+            case "/card_session/start":
+                Redis.addFlashcardSession(isValidSession, jsonData, ctx);
+                break;
+            case "/card_session/solve":
+                Redis.evaluateAnswer(isValidSession, jsonData, ctx);
                 break;
         }
     }

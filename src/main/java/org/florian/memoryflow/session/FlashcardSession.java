@@ -1,37 +1,49 @@
 package org.florian.memoryflow.session;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 public class FlashcardSession {
 
-    HashMap<Integer, ArrayList<String>> flashcards = new HashMap<>();
+    HashMap<Integer, String> flashcards = new HashMap<>();
     int mistakes = 0;
-    int firstTries = 0;
+    int correct = 0;
 
-    public FlashcardSession(HashMap<Integer, ArrayList<String>> flashcards) {
+    public FlashcardSession() {
+    }
+
+    public FlashcardSession(HashMap<Integer, String> flashcards) {
         this.flashcards = flashcards;
+    }
+
+    public void setCorrect(int correct) {
+        this.correct = correct;
+    }
+
+    public void addCorrect() {
+        this.correct += 1;
+    }
+
+    public int getCorrect() {
+        return correct;
     }
 
     public void setMistakes(int mistakes) {
         this.mistakes = mistakes;
     }
-    public void setFirstTries(int firstTries) {
-        this.firstTries = firstTries;
+
+    public void addMistake() {
+        this.mistakes += 1;
     }
 
     public int getMistakes() {
-            return mistakes;
-    }
-    public int getFirstTries() {
-        return firstTries;
+        return mistakes;
     }
 
-    public HashMap<Integer, ArrayList<String>> getFlashcards() {
+    public HashMap<Integer, String> getFlashcards() {
         return flashcards;
     }
 
-    public void setFlashcards(HashMap<Integer, ArrayList<String>> flashcards) {
+    public void setFlashcards(HashMap<Integer, String> flashcards) {
         this.flashcards = flashcards;
     }
 

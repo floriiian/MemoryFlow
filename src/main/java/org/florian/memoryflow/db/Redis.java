@@ -6,13 +6,17 @@ import io.javalin.http.Context;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.florian.memoryflow.account.Login;
+import org.florian.memoryflow.api.requests.CardSessionRequest;
 import org.florian.memoryflow.api.responses.ErrorResponse;
 
+import org.florian.memoryflow.api.responses.endFlashcardSessionResponse;
 import org.florian.memoryflow.session.FlashcardSession;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import redis.clients.jedis.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 
 public class Redis {
 
@@ -21,34 +25,37 @@ public class Redis {
     private static final Database db = Database.getInstance();
     static JedisPool jedisPool = new JedisPool(new JedisPoolConfig(), "localhost", 6379);
 
-    public static void addFlashcardSession(boolean isLoggedIn, JsonNode jsonData, Context ctx) throws Exception {
+    public static void addFlashcardSession(boolean isLoggedIn, String requestedData, Context ctx) throws Exception {
         if (!isLoggedIn) {
             ctx.status(500);
             return;
         }
         int user_id = Integer.parseInt(Login.getAccountIDByToken(ctx.cookie("sessionToken")));
-        String cardIdText = String.valueOf(jsonData.get("card_ids"));
+        deleteFlashcardSession(user_id);
 
-        LOGGER.debug(cardIdText);
-        int[] card_ids = {34, 2};
-
+        CardSessionRequest request = OBJECT_MAPPER.readValue(requestedData, CardSessionRequest.class);
+        int[] card_ids = request.card_ids();
         try (Jedis jedis = jedisPool.getResource()) {
-            deleteFlashcardSession(user_id); // TODO: Debug
-            ArrayList<Integer> flashcardIDs = db.getAllFlashcardIDsFromUser(String.valueOf(user_id));
+            Set<Integer> flashcardIDs = db.getAllFlashcardIDsFromUser(String.valueOf(user_id));
             HashMap<Integer, String> flashcardData = new HashMap<>();
             for (Integer card_id : card_ids) {
                 if (!flashcardIDs.contains(card_id)) {
-                    returnFailedRequest(ctx, "Exposed invalid card id", user_id);
-                } else {
-                    flashcardData.put(card_id, db.getSolution(String.valueOf(card_id)));
+                    returnFailedRequest(ctx, "Unknown card id", user_id);
+                    return;
                 }
+                flashcardData.put(card_id, db.getSolution(String.valueOf(card_id)));
             }
-            String sessionObject = OBJECT_MAPPER.writeValueAsString(new FlashcardSession(flashcardData));
-            jedis.set("flashcardSession:" + user_id, sessionObject);
-            ctx.status(200);
-            ctx.contentType("application/json");
-            ctx.result(sessionObject);
+            if (flashcardData.isEmpty()) {
+                returnFailedRequest(ctx, "No flashcards found", user_id);
+            } else {
+                String sessionObject = OBJECT_MAPPER.writeValueAsString(new FlashcardSession(flashcardData));
+                jedis.set("flashcardSession:" + user_id, sessionObject);
+                ctx.status(200);
+                ctx.contentType("application/json");
+                ctx.result(sessionObject);
+            }
         } catch (Exception e) {
+            ctx.status(500);
             LOGGER.debug(e);
         }
     }
@@ -59,28 +66,53 @@ public class Redis {
             return;
         }
         int user_id = Integer.parseInt(Login.getAccountIDByToken(ctx.cookie("sessionToken")));
-        String answer = jsonData.get("answer").asText();
-        int card_id = jsonData.get("card_id").asInt();
+        try {
+            String answer = jsonData.get("answer").asText();
+            int card_id = jsonData.get("card_id").asInt();
 
-        FlashcardSession user_session = getFlashcardSession(user_id);
+            FlashcardSession user_session = getFlashcardSession(user_id);
+            if (user_session == null) {
+                returnFailedRequest(ctx, null, user_id);
+                return;
+            }
+            HashMap<Integer, String> flashcards = user_session.getFlashcards();
+            String solution = flashcards.get(card_id);
+            if (solution == null) {
+                returnFailedRequest(ctx, "No solution found", user_id);
+            } else {
+                if (solution.equals(answer)) {
+                    user_session.addCorrect();
+                    flashcards.remove(card_id);
+                } else {
+                    user_session.addMistake();
+                    ctx.status(400);
+                }
+                updateFlashcardSession(user_id, user_session);
+            }
+        } catch (Exception e) {
+            ctx.status(400);
+            LOGGER.debug(e);
+        }
+    }
 
-        if (user_session == null) {
-            returnFailedRequest(ctx, null, user_id);
+    public static void endFlashcardSession(Context ctx) throws Exception {
+        int user_id = Integer.parseInt(Login.getAccountIDByToken(ctx.cookie("sessionToken")));
+
+        FlashcardSession session = getFlashcardSession(user_id);
+        if(session == null) {
+            returnFailedRequest(ctx, "No active session", user_id);
             return;
         }
-        HashMap<Integer, String> flashcards = user_session.getFlashcards();
-        String solution = flashcards.get(card_id);
-        if (solution == null) {
-            returnFailedRequest(ctx, "No solution found", user_id);
-        } else {
-            if (solution.equals(answer)) {
-                user_session.addCorrect();
-                flashcards.remove(card_id);
-            } else {
-                user_session.addMistake();
-            }
-            updateFlashcardSession(user_id, user_session);
-        }
+
+        int correct = session.getCorrect();
+        int mistakes = session.getMistakes();
+        long collectedXP = Math.min(Math.round(correct * 20 - (mistakes * 0.5)), 1000);
+
+        // TODO: Implement support for daily-missions.
+        deleteFlashcardSession(user_id);
+        ctx.status(200);
+        ctx.contentType("application/json");
+        ctx.result(OBJECT_MAPPER.writeValueAsString(new endFlashcardSessionResponse(correct, mistakes, collectedXP)));
     }
 
     private static void deleteFlashcardSession(int user_id) {
@@ -97,16 +129,17 @@ public class Redis {
         }
     }
 
+    @Nullable
     private static FlashcardSession getFlashcardSession(int user_id) {
-        try (Jedis jedis = jedisPool.getResource()) {
+        try (Jedis  jedis = jedisPool.getResource()) {
             return OBJECT_MAPPER.readValue(jedis.get("flashcardSession:" + user_id), FlashcardSession.class);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            return null;
         }
     }
 
-    private static void returnFailedRequest(Context ctx, String errorMessage, int user_id) throws Exception {
-        ctx.status(500);
+    private static void returnFailedRequest(@NotNull Context ctx, String errorMessage, int user_id) throws Exception {
+        ctx.status(400);
         ctx.contentType("application/json");
         ctx.result(OBJECT_MAPPER.writeValueAsString(new ErrorResponse(errorMessage)));
         deleteFlashcardSession(user_id);

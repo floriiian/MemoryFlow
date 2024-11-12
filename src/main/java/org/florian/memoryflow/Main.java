@@ -61,7 +61,7 @@ public class Main {
         app.get("/get/leaderboard", ctx -> handleGetRequest("/get/leaderboard", ctx));
         app.get("/get/daily_missions", ctx -> handleGetRequest("/get/daily_missions", ctx));
         app.get("/get/card_categories", ctx -> handleGetRequest("/get/card_categories", ctx));
-
+        app.get("/get/card_session/end", ctx -> handleGetRequest("/get/card_session/end", ctx));
     }
 
 
@@ -87,6 +87,8 @@ public class Main {
                 case "/get/card_categories":
                     Flashcards.getFlashCardCategories(ctx);
                     break;
+                case "/get/card_session/end":
+                    Redis.endFlashcardSession(ctx);
             }
         }
     }
@@ -121,7 +123,7 @@ public class Main {
                 Flashcards.deleteFlashcard(isValidSession, jsonData, ctx);
                 break;
             case "/card_session/start":
-                Redis.addFlashcardSession(isValidSession, jsonData, ctx);
+                Redis.addFlashcardSession(isValidSession, requestedData, ctx);
                 break;
             case "/card_session/solve":
                 Redis.evaluateAnswer(isValidSession, jsonData, ctx);

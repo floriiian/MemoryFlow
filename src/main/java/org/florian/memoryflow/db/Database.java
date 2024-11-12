@@ -232,13 +232,14 @@ public class Database {
         }
     }
 
-    public ArrayList<Integer> getAllFlashcardIDsFromUser(String user_id) {
+    public Set<Integer> getAllFlashcardIDsFromUser(String user_id) {
         String sql = "SELECT card_id FROM flashcards WHERE user_id = ?";
         try (PreparedStatement preparedStmt = CONNECTION.prepareStatement(sql)) {
             preparedStmt.setString(1, user_id);
             ResultSet result = preparedStmt.executeQuery();
 
-            ArrayList<Integer> resultMap = new ArrayList<>();
+            Set<Integer> resultMap = new HashSet<>() {
+            };
             while (result.next()) {
                 resultMap.add(result.getInt("card_id"));
             }

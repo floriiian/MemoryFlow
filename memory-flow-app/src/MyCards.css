@@ -1,6 +1,6 @@
 .flashcardsContainer {
     position: fixed;
-    transform: translate(33%,12%);
+    transform: translate(33%,30%);
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 22em));
     grid-gap: 2em;
@@ -36,10 +36,16 @@
     overflow: hidden;
 }
 
+.flashcard.selected {
+    box-shadow: 0 1px 1px 3px #88aaea;
+    transition: 0.1s;
+    animation: cardSelect 0.1s ease-in;
+}
+
 .flashcard:hover{
     background: rgb(62, 62, 98);
     cursor: pointer;
-    box-shadow: 0 1px 1px 3px #6786c3;
+
     transition: 0.2s;
 }
 
@@ -132,6 +138,24 @@
     }
 
 }
+
+@keyframes cardSelect {
+    0%  {
+        box-shadow: 0 1px 1px 3px #88aaea;
+        transform: scale(1);
+    }
+    50% {
+        box-shadow: 0 1px 1px 5px #88aaea;
+        transform: scale(1.01);
+    }
+    100% {
+        box-shadow: 0 1px 1px 3px #88aaea;
+        transform: scale(1);
+    }
+
+}
+
+
 
 .error-message {
     position: absolute;

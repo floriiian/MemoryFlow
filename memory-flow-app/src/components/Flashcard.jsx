@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState} from "react";
 import editIcon from '../assets/edit_icon.png'
 import deleteIcon from '../assets/delete.png'
 import {useParams} from "react-router-dom";
@@ -6,12 +6,18 @@ import {useParams} from "react-router-dom";
 const Flashcard = (props) => {
 
     const {category} = useParams();
+    const [isSelected, selectCard] = useState(false);
 
     return (
         <div
             key={props.name}
-            className={"flashcard"}
-            onClick={() => props.selectFlashcard(props.card_id)}
+            // "flashcard active"
+            className={isSelected ? "flashcard selected" : "flashcard"}
+            onClick={() => {
+                props.selectFlashcard(props.card_id)
+                selectCard(!isSelected);
+                console.log(isSelected)
+            }}
         >
             <div className={"inner-flashcard"}>
                 <p className={"flashcard-category"}>{props.question}</p>

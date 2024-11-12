@@ -68,8 +68,6 @@ function CardCategories() {
             <p className={"error-message"}>{errorMessage}
                 <Link to="/add_card" style={{opacity: redirectLinkVisible ? 1 : 0}} className={"redirectLink add-cards"}>add some.</Link>
             </p>
-
-
         </div>
     );
 }

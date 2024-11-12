@@ -13,6 +13,7 @@ function Cards() {
     const [errorMessage, setErrorMessage] = useState("");
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+    const [selectedCards, toggleSelectedCard] = useState([]);
 
 
     function editFlashcard(card_id) {
@@ -20,9 +21,17 @@ function Cards() {
     }
 
     function selectFlashcard(card_id) {
-        console.log("Selected: " + card_id)
-    }
+        toggleSelectedCard((prevSelectedCards) => {
+            const newSelectedCards = prevSelectedCards.includes(card_id)
+                ? prevSelectedCards.filter(function(id) {
+                    return id !== card_id;
+                })
+                : [...prevSelectedCards, card_id];
 
+            console.log(newSelectedCards); // Log it here after calculating the new value
+            return newSelectedCards;
+        });
+    }
     function deleteFlashcard(card_id, category) {
         postRequest("delete/card", {
             "card_id": card_id,
@@ -82,6 +91,7 @@ function Cards() {
                             editFlashcard={editFlashcard}
                             selectFlashcard={selectFlashcard}
                             deleteFlashcard={deleteFlashcard}
+                            selected={false}
                         />
                     ))
                 )}

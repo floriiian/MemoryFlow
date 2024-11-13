@@ -1,7 +1,7 @@
-import {Outlet, redirect, useNavigate, useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import '../index.css';
 import '../MyCards.css';
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useRef, useState} from "react";
 import {requestCards} from "../handlers/cardHandlers.jsx";
 import Flashcard from "../components/Flashcard.jsx";
 import Navbar from "../Navbar.jsx";
@@ -15,23 +15,21 @@ function Cards() {
     const navigate = useNavigate();
     const [selectedCards, toggleSelectedCard] = useState([]);
 
-
     function editFlashcard(card_id) {
         navigate("/edit_card/" + card_id);
     }
 
     function selectFlashcard(card_id) {
         toggleSelectedCard((prevSelectedCards) => {
-            const newSelectedCards = prevSelectedCards.includes(card_id)
-                ? prevSelectedCards.filter(function(id) {
-                    return id !== card_id;
-                })
+            const updatedSelectedCards = prevSelectedCards.includes(card_id)
+                ? prevSelectedCards.filter((id) => id !== card_id)
                 : [...prevSelectedCards, card_id];
+            localStorage.setItem('selected-cards', JSON.stringify(updatedSelectedCards));
 
-            console.log(newSelectedCards); // Log it here after calculating the new value
-            return newSelectedCards;
+            return updatedSelectedCards;
         });
     }
+
     function deleteFlashcard(card_id, category) {
         postRequest("delete/card", {
             "card_id": card_id,
@@ -66,13 +64,17 @@ function Cards() {
 
             }
         };
-        fetchCards();
+        fetchCards().then(r => console.log("Cards loaded"));
     }
 
+    const hasRun = useRef(false);
     useEffect(() => {
-        loadCards();
-
-    }, [category]);
+        if (!hasRun.current) {
+            hasRun.current = true;
+            localStorage.setItem('selected-cards', null);
+            loadCards();
+        }
+    }, []);
 
     return (
         <div className="baseBody">
@@ -95,6 +97,9 @@ function Cards() {
                         />
                     ))
                 )}
+                <button onClick= {() => {
+                    navigate("/card_session")
+                }} className={"session-start-btn" + (selectedCards.length === 0 ? " disabled" : "")}>Start</button>
             </div>
             <p className={"error-message"}>{errorMessage}</p>
             <Navbar/>

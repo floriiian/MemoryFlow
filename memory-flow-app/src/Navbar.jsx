@@ -13,8 +13,6 @@ import goalIcon from './assets/progression-icons/goal_icon.png';
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import LeaderboardUser from "./components/LeaderboardUser.jsx";
-import {getRequest} from "./api/Requests.jsx";
-import {couch} from "globals";
 import {getData} from "./handlers/cardHandlers.jsx";
 
 function Navbar() {

@@ -10,12 +10,17 @@ import CardCategories from "./routes/CardCategories.jsx";
 import AddCards from "./routes/AddCards.jsx";
 import Cards from "./routes/Cards.jsx";
 import EditCard from "./routes/EditCard.jsx";
+import CardSession from "./routes/CardSession.jsx";
 
 
 const router = createBrowserRouter([
     {
         path: "/",
         element: <Homepage />,
+    },
+    {
+        path: "/card_session",
+        element: <CardSession />,
     },
     {
         path: "/my_cards",

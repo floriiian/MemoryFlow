@@ -11,13 +11,13 @@ const Flashcard = (props) => {
     return (
         <div
             key={props.name}
-            // "flashcard active"
             className={isSelected ? "flashcard selected" : "flashcard"}
             onClick={() => {
                 props.selectFlashcard(props.card_id)
                 selectCard(!isSelected);
-                console.log(isSelected)
+
             }}
+
         >
             <div className={"inner-flashcard"}>
                 <p className={"flashcard-category"}>{props.question}</p>

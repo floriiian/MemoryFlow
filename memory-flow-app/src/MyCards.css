@@ -1,11 +1,12 @@
 .flashcardsContainer {
     position: fixed;
-    transform: translate(33%,30%);
+    top: 9.5%;
+    left: 17.8%;
+    transform: none;
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 22em));
     grid-gap: 2em;
     z-index: 10;
-    animation: cardsAppear 0.3s ease-in;
     max-width: 90vw;
     max-height: 85vh;
     padding: 1em;
@@ -124,6 +125,58 @@
     display: none;
 }
 
+
+
+.error-message {
+    position: absolute;
+    font-weight: bold;
+    font-size: 2em;
+    color: #c5c5be;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+.redirectLink.add-cards{
+    margin: 0;
+    font-size: 1em;
+}
+
+.session-start-btn {
+    position: relative;
+    font-weight: bold;
+    padding: 1em 0;
+    font-size: 1em;
+    background-color: #647eff;
+    color: #fbfbfb;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 0.3em #4d5fc3;
+    cursor: pointer;
+    transition: 0.1s;
+    text-transform: uppercase;
+}
+
+.session-start-btn:hover {
+    background-color: #7897ff;
+    animation: buttonHold 0.1s;
+}
+
+.session-start-btn:active {
+    border: none;
+    transform: translateY(5%);
+    box-shadow: none;
+}
+
+.session-start-btn:focus{
+    outline: none;
+}
+
+.session-start-btn.disabled{
+    opacity: 0.1;
+    pointer-events: none;
+}
+
 @keyframes cardsAppear {
     0%  {
         opacity: 0;
@@ -155,19 +208,15 @@
 
 }
 
+@keyframes buttonHold {
+    0%  {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.01);
+    }
+    100% {
+        transform: scale(1);
+    }
 
-
-.error-message {
-    position: absolute;
-    font-weight: bold;
-    font-size: 2em;
-    color: #c5c5be;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-}
-.redirectLink.add-cards{
-    margin: 0;
-    font-size: 1em;
 }

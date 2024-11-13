@@ -26,12 +26,14 @@ public class Redis {
     static JedisPool jedisPool = new JedisPool(new JedisPoolConfig(), "localhost", 6379);
 
     public static void addFlashcardSession(boolean isLoggedIn, String requestedData, Context ctx) throws Exception {
-        if (!isLoggedIn) {
+        if (!isLoggedIn  || isRedisOffline()) {
             ctx.status(500);
             return;
         }
         int user_id = Integer.parseInt(Login.getAccountIDByToken(ctx.cookie("sessionToken")));
         deleteFlashcardSession(user_id);
+
+        LOGGER.debug(requestedData);
 
         CardSessionRequest request = OBJECT_MAPPER.readValue(requestedData, CardSessionRequest.class);
         int[] card_ids = request.card_ids();
@@ -61,7 +63,7 @@ public class Redis {
     }
 
     public static void evaluateAnswer(boolean isLoggedIn, JsonNode jsonData, Context ctx) throws Exception {
-        if (!isLoggedIn) {
+        if (!isLoggedIn || isRedisOffline()) {
             ctx.status(500);
             return;
         }
@@ -99,8 +101,12 @@ public class Redis {
         int user_id = Integer.parseInt(Login.getAccountIDByToken(ctx.cookie("sessionToken")));
 
         FlashcardSession session = getFlashcardSession(user_id);
-        if(session == null) {
+        if (session == null) {
             returnFailedRequest(ctx, "No active session", user_id);
+            return;
+        }
+        if(isRedisOffline()){
+            ctx.status(500);
             return;
         }
 
@@ -118,6 +124,17 @@ public class Redis {
     private static void deleteFlashcardSession(int user_id) {
         try (Jedis jedis = jedisPool.getResource()) {
             jedis.del("flashcardSession:" + user_id);
+        } catch (Exception e) {
+            LOGGER.debug("Redis Database is probably offline.");
+        }
+    }
+
+    private static boolean isRedisOffline() {
+        try (Jedis jedis = jedisPool.getResource()) {
+            return false;
+        } catch (Exception e) {
+            LOGGER.debug("Redis is most likely offline.");
+            return true;
         }
     }
 
@@ -131,7 +148,7 @@ public class Redis {
 
     @Nullable
     private static FlashcardSession getFlashcardSession(int user_id) {
-        try (Jedis  jedis = jedisPool.getResource()) {
+        try (Jedis jedis = jedisPool.getResource()) {
             return OBJECT_MAPPER.readValue(jedis.get("flashcardSession:" + user_id), FlashcardSession.class);
         } catch (Exception e) {
             return null;

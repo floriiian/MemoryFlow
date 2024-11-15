@@ -1,5 +1,5 @@
-button:focus{
-    outline:none;
+button:focus {
+    outline: none;
 }
 
 .cards-container {
@@ -44,7 +44,7 @@ button:focus{
     border: 3px solid rgb(192, 192, 192);
 }
 
-.card__field:focus, input:focus{
+.card__field:focus, input:focus {
     outline: none;
 }
 
@@ -59,7 +59,7 @@ button:focus{
     transform: translateX(-50%);
 }
 
-.speaker-icon{
+.speaker-icon {
     margin-left: 40px;
     position: absolute;
     display: flex;
@@ -69,7 +69,8 @@ button:focus{
     height: 40px;
     transition: 0.3s;
 }
-.speaker-icon:hover{
+
+.speaker-icon:hover {
     cursor: pointer;
     filter: invert(20%) sepia(2%) saturate(143%) hue-rotate(314deg) brightness(103%) contrast(96%);
     transition: 0.3s;
@@ -108,6 +109,7 @@ button:focus{
         transform-origin: left;
     }
 }
+
 @keyframes revealContentAnim {
     to {
         transform: scale(0);
@@ -155,6 +157,7 @@ button:focus{
     animation: fadeIn 0.2s;
     z-index: 4;
 }
+
 #black-blur {
     background-color: black;
     width: 100%;
@@ -162,23 +165,31 @@ button:focus{
     position: fixed;
     top: 0;
     left: 0;
-    z-index: -2;
+    z-index: 1;
     opacity: 0.3;
     animation: fadeInOpaque 0.2s;
 }
 
 @keyframes fadeIn {
-    0% { opacity: 0; }
-    100% { opacity: 1; }
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 
 @keyframes fadeInOpaque {
-    0% { opacity: 0; }
-    100% { opacity: 0.3; }
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 0.3;
+    }
 }
 
 
-.quit_form img{
+.quit_form img {
     width: 15em;
 }
 
@@ -214,6 +225,7 @@ button:focus{
     transition: 0.1s;
     text-transform: uppercase;
 }
+
 .exit_button {
     margin: 5px;
     width: 240px;
@@ -236,12 +248,12 @@ button:focus{
     background-color: transparent;
 }
 
-.btn:active{
+.btn:active {
     box-shadow: none;
     transform: translateY(5px);
 }
 
-.btn:hover{
+.btn:hover {
     background-color: #cdcbf4;
 }
 
@@ -257,7 +269,8 @@ button:focus{
     overflow: hidden;
     border: none;
     padding: 0;
-    width: 2em; height: 2em;
+    width: 2em;
+    height: 2em;
     border-radius: 50%;
     background: transparent;
     color: #51646c;
@@ -267,26 +280,25 @@ button:focus{
 
     &:before, &:after {
         position: absolute;
-        top: 15%; left: calc(50% - .0625em);
-        width: .125em; height: 70%;
+        top: 15%;
+        left: calc(50% - .0625em);
+        width: .125em;
+        height: 70%;
         border-radius: .125em;
         transform: rotate(45deg);
         background: currentcolor;
         content: ''
     }
 
-    &:after { transform: rotate(-45deg); }
+    &:after {
+        transform: rotate(-45deg);
+    }
 }
 
-#completionScreen{
-    opacity: 0;
-    pointer-events: none; /* Ensures the hidden modal is not clickable */
+#completionScreen {
     transition: opacity 0.1s ease-in;
 }
-#completionScreen.active {
-    opacity: 1;
-    pointer-events: auto; /* Allows interaction when modal is visible */
-}
+
 @keyframes slide {
     from {
         background-position: 0 0;
@@ -295,37 +307,32 @@ button:focus{
         background-position: -120px 60px;
     }
 }
-.modal {
+
+.completion-modal {
     overflow: hidden;
     position: absolute;
     font-weight: bold;
     left: 50%;
     top: 50%;
     min-width: 300px;
-    min-height: 400px;
-    width: auto;
+    min-height: 300px;
     display: inline-flex;
     flex-direction: column;
     align-items: center;
-    background-color: rgba(211, 169, 169, 0.36);
-
-    padding: 30px;
-    border: 3px solid rgba(255, 255, 255, .25);
+    padding: 2.5em;
+    border: 3px solid rgb(55, 68, 77);
     border-radius: 20px;
-    background-color: #756DE4;
-    box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(15px);
+    background-color: #1a1c2e;
     margin: 5px;
-    justify-content: center;
     text-align: center;
-
-    transform:translate(-50%, -50%) scale(1);
+    transform: translate(-50%, -50%) scale(1);
+    z-index: 4;
 }
-.message {
 
+.knowledge-message {
     color: white;
     font-weight: bold;
-    font-size:1.6rem;
+    font-size: 1.6rem;
     margin-bottom: 0;
 
 }
@@ -336,20 +343,42 @@ button:focus{
     justify-content: space-between;
 }
 
+.selectbutton.completion {
+    font-weight: bold;
+    padding: 1em;
+}
+
+.selectbutton.completion:hover {
+    font-weight: bold;
+    padding: 1em;
+    background-color: #6073e2;
+}
+
+.selectbutton.completion:active {
+    font-weight: bold;
+    padding: 1em;
+    box-shadow: none;
+    transform: translateY(5%);
+}
+
+
 /* Score */
 
 .arc {
-    border: 10px solid rgb(203, 200, 255);
+    border: 10px solid rgb(82, 82, 82);
 }
+
 .bg {
-    border: 10px solid rgb(60, 54, 134);
+    border: 10px solid rgb(99, 125, 253);
 }
+
 .container {
     position: relative;
     overflow: hidden;
-    width: calc(200 * 1.5px);
-    height: calc(100 * 1.5px);
+    width: calc(200 * 0.1em);
+    height: calc(100 * 0.1em);
 }
+
 .arc, .bg {
     position: absolute;
     width: 100%;
@@ -357,35 +386,28 @@ button:focus{
     box-sizing: border-box;
     border-radius: 50%;
 }
+
 .arc {
     border-top-color: transparent;
     border-right-color: transparent;
     transform: rotate(-45deg);
 }
+
 .value {
     position: absolute;
     width: 100%;
     bottom: 25px;
     font-weight: bold;
-    font-size: 1.2em;
+    font-size: 2.3em;
     text-align: center;
     color: rgb(255, 255, 255);
 }
+
 .content {
     padding: 50px;
     text-align: center;
 }
 
-#errorScreen{
-    font-size: 0.9em;
-    opacity: 0;
-    pointer-events: none; /* Ensures the hidden modal is not clickable */
-    transition: opacity 0.1s ease-in;
-}
-#errorScreen.active {
-    opacity: 1;
-    pointer-events: auto; /* Allows interaction when modal is visible */
-}
 @keyframes slide {
     from {
         background-position: 0 0;
@@ -394,36 +416,50 @@ button:focus{
         background-position: -120px 60px;
     }
 }
-.modal2 {
-    overflow: hidden;
+
+
+.errorImage {
+    width: 450px;
+    bottom: 0;
+    position: fixed;
+    z-index: 1;
+    -webkit-user-drag: none;
+    transition: 0.2s ease-in;
+}
+.errorImage:hover{
+    transform: scale(1.01);
+}
+
+.error-modal {
+
     position: absolute;
     font-weight: bold;
     left: 50%;
     top: 50%;
     min-width: 200px;
     min-height: 200px;
-    width: auto;
+    max-width: 600px;
     display: inline-flex;
     flex-direction: column;
     align-items: center;
-    font-size: 1.1em;
     padding: 30px;
-    border: 3px solid rgba(255, 255, 255, .25);
+    border: 3px solid rgb(64, 67, 83);
     border-radius: 20px;
-    background-color: #131f24;
-    box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(15px);
+    background-color: #1a1c2e;
     margin: 5px;
     justify-content: center;
     text-align: center;
-
-    transform:translate(-50%, -50%) scale(1);
+    transform: translate(-50%, -50%) scale(1);
+    color: white;
+    font-size: 1.5em;
+    z-index: 4;
 }
-.errorDescription{
+
+.errorDescription {
     font-weight: bold;
     font-size: 0.9em;
+    width: 70%;
     text-align: center;
-    overflow: hidden;
     color: rgb(255, 255, 255);
 }
 
@@ -437,6 +473,12 @@ button:focus{
     z-index: 0;
 }
 
+.btn.selectbutton.error{
+    font-size: 0.7em;
+    width: 15em;
+    margin: 1em;
+    padding: 0;
+}
 
 @keyframes loader {
     0% {
@@ -470,9 +512,11 @@ button:focus{
         width: 100%;
     }
 }
+
 .progress-bar span {
     display: block;
 }
+
 .bar {
     background: rgb(55, 69, 78);
 }
@@ -497,6 +541,7 @@ button:focus{
     height: 3px;
     background: #7d7db7;
 }
+
 .progress-bar {
     left: 50%;
     top: 70px;
@@ -512,12 +557,23 @@ button:focus{
 }
 
 @keyframes shake {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(-3px); }
-    50% { transform: translateX(3px); }
-    75% { transform: translateX(-3px); }
-    100% { transform: translateX(0); }
+    0% {
+        transform: translateX(0);
+    }
+    25% {
+        transform: translateX(-3px);
+    }
+    50% {
+        transform: translateX(3px);
+    }
+    75% {
+        transform: translateX(-3px);
+    }
+    100% {
+        transform: translateX(0);
+    }
 }
+
 .shake {
     position: fixed; /* Ensures shaking is horizontal only */
     animation: shake 0.3s ease;
@@ -525,16 +581,22 @@ button:focus{
 }
 
 @keyframes fadeInOut {
-    0% { opacity: 0; }
-    50% { opacity: 1; }
-    100% { opacity: 0; }
+    0% {
+        opacity: 0;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+    }
 }
 
 .fade {
     animation: fadeInOut 1s ease-in-out;
 }
 
-.correct-answers{
+.correct-answers {
     align-content: center;
     position: absolute;
     margin-left: auto;
@@ -544,11 +606,13 @@ button:focus{
     left: 68%;
 }
 
-.streak-icon{
-    width: 32px; height: 32px;
+.streak-icon {
+    width: 32px;
+    height: 32px;
 }
-.correct-answer-amount{
-    position:  absolute;
+
+.correct-answer-amount {
+    position: absolute;
     top: 3px;
     left: 40px;
 
@@ -598,6 +662,7 @@ button:focus{
     height: 200px;
     transform: translateX(-60%) translateY(12%);
 }
+
 .footer-headline {
     position: absolute;
     left: 35%;
@@ -607,6 +672,7 @@ button:focus{
     font-size: 25px;
     color: #d64747;
 }
+
 .footer-solution {
     position: absolute;
     left: 35%;
@@ -692,7 +758,7 @@ button:focus{
     border: none;
 }
 
-.check-button.continue{
+.check-button.continue {
     background-color: #d44646;
     color: #21253d;;
     box-shadow: 0 0.1em #c73333;

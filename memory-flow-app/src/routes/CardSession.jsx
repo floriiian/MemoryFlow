@@ -4,15 +4,14 @@ import correctIcon from "../assets/streak_icon.png"
 import speakerIcon from "../assets/speaker_icon.png"
 import React from 'react';
 import {useEffect, useRef, useState} from "react";
-import {postRequest} from "../api/Requests.jsx";
+import {getRequest, postRequest} from "../api/Requests.jsx";
 import ExitScreen from "../components/ExitScreen.jsx";
 import {Form, useNavigate} from "react-router-dom";
-import {checkFlashcard} from "../handlers/cardHandlers.jsx";
-import flashcard from "../components/Flashcard.jsx";
 import CompletionScreen from "../components/CompletionScreen.jsx";
+import ErrorScreen from "../components/ErrorScreen.jsx";
+import errorIcon from "../assets/error.png";
 
 function CardSession() {
-
 
     const navigate = useNavigate();
     const [selectedCards, setSelectedCards] = useState(
@@ -26,9 +25,10 @@ function CardSession() {
     }
 
     const [correctAnswers, setCorrectAnswers] = useState(0)
-    const [mistakes, setMistakes] = useState(0)
     const [currentCard, setCurrentCard] = useState({})
+    const [knowledgePercent, setKnowledgePercent] = useState(0)
 
+    const [errorScreenShown, toggleErrorScreen] = useState(false)
     const [exitScreenShown, toggleExitScreen] = useState(false);
     const [circleShown, toggleCircle] = useState(false)
     const [incorrectAnswer, toggleIncorrectAnswer] = useState(false)
@@ -46,10 +46,12 @@ function CardSession() {
                 }).then((response) => {
                     setFlashcards(response["flashcards"]);
                 }).catch((error) => {
-                    console.log(error);
+                    console.log(error)
+                    toggleErrorScreen(true)
                 });
             } catch (error) {
-                console.log(error);
+                console.log(error)
+                toggleErrorScreen(true)
             }
         }
     }, []);
@@ -58,6 +60,7 @@ function CardSession() {
     }, [flashcards]);
 
     function loadCard() {
+        setFormData({answer: ""})
         const remainingFlashcards = Object.keys(flashcards).length;
         if (remainingFlashcards > 0) {
             const [id, card] = Object.entries(flashcards)[Math.floor(Math.random() * remainingFlashcards)];
@@ -69,28 +72,49 @@ function CardSession() {
                 }))
             }
         } else {
-            //   TODO          toggleCompleted(true); Debug tomorrow / TODO
+            if(correctAnswers > 0) {
+                try {
+                    getRequest("get/card_session/end").then((response) => {
+                        toggleCompleted(true);
+                        let correct = response["correct"];
+                        let mistakes = response["mistakes"];
+                        let xp = response["xp"];
+                        let percentage = Math.round(Math.min((correct / (correct + mistakes)) * 100, 100));
+                        setKnowledgePercent(percentage)
+                    }).catch((error) => {
+                        console.log(error)
+                        toggleErrorScreen(true)
+                    });
+                } catch (error) {
+                    console.log(error)
+                    toggleErrorScreen(true)
+                }
+            }
         }
     }
 
     function handleSubmit() {
         let answer = formData.answer;
-        if (answer === currentCard["solution"]) {
-            setCorrectAnswers(correctAnswers => correctAnswers + 1);
-            setFlashcards([])
-            formData.answer = answer = "";
-            loadCard()
-        } else {
-            [toggleCircle, toggleIncorrectAnswer].forEach((e => {
-                e(true)
-            }))
-            formData.answer = answer = "";
-            setMistakes(mistakes => mistakes + 1)
-        }
-    }
 
-    function redoQuiz() {
-        console.log("redoing quiz...")
+        if(Object.keys(flashcards).length > 0) {
+            try {
+                postRequest("card_session/solve", {
+                    "answer": answer,
+                    "card_id" : currentCard["id"]
+                }).then((_) => {
+                    setCorrectAnswers(correctAnswers => correctAnswers + 1);
+                    delete flashcards[currentCard["id"]]
+                    loadCard();
+                }).catch((_) => {
+                    [toggleCircle, toggleIncorrectAnswer].forEach((e => {
+                        e(true)
+                    }))
+                });
+            } catch (error) {
+                console.log(error)
+                toggleErrorScreen(true)
+            }
+        }
     }
 
     function toggleQuitScreen() {
@@ -155,46 +179,42 @@ function CardSession() {
                     </div>
                 </div>
 
-                {hasCompleted ? <CompletionScreen redoQuiz={redoQuiz}/> : undefined}
+                {hasCompleted ? <CompletionScreen knowledgePercentage={knowledgePercent}/> : undefined}
 
-                {exitScreenShown ? <div id={"black-blur"}></div> : ""};
+                {(exitScreenShown || hasCompleted || errorScreenShown) ? <div id={"black-blur"}></div> : null}
                 {exitScreenShown ? (
                     <ExitScreen
                         toggleQuitScreen={toggleQuitScreen}
                         backToCards={() => {
                             navigate("/my_cards")
                         }}
-                    />) : ""}
-                {(2 + 23 === 5) ? <div id="errorScreen">
-                    <div className="background-overlay"/>
-                    <div className="modal2" id="innerErScreen">
-                        <p className="message">Uh-oh? Something's weird!</p>
-                        <p className="errorDescription"/>
-                        <div className="options">
-                            <button className="btn" onClick="restartQuiz()">
-                                <span>Reconnect</span>
-                            </button>
-                            <a href="/">
-                                <button className="btn">
-                                    <span>Exit</span>
-                                </button>
-                            </a>
-                        </div>
-                    </div>
-                </div> : ""}
+                    />) : null}
 
-                <div className="footer-container" style = {{backgroundColor: circleShown ? "#21253d": "#1a1c2e"}}>
+                {errorScreenShown ?
+                    <>
+                        <ErrorScreen></ErrorScreen>
+                        <div className={"buttomImage"}>
+                            <img className={"errorImage"} alt={"Error"} src={errorIcon}/>
+                        </div>
+                    </>
+                : null}
+
+                <div className="footer-container" style={{backgroundColor: circleShown ? "#21253d" : "#1a1c2e"}}>
                     <div className="footer-line"/>
                     <div className="footer-container">
                         <div className="button-wrapper">
                             <button className="skip-button"
-                                    onClick={() => {console.log("Skipping card..")}}
-                                    style = {{opacity: incorrectAnswer ? 0 : 1}}>Skip
+                                    onClick={() => {
+                                        console.log("Skipping card..")
+                                    }}
+                                    style={{opacity: incorrectAnswer ? 0 : 1}}>Skip
                             </button>
 
                             {incorrectAnswer ?
                                 <button className={"check-button continue"}
-                                        onClick={() => {loadCard()}}
+                                        onClick={() => {
+                                            loadCard()
+                                        }}
                                         id="checkButton">Continue</button>
                                 : undefined
                             }
@@ -203,7 +223,9 @@ function CardSession() {
                                 <button
                                     className={"check-button"}
                                     id="checkButton"
-                                    onClick={() => {handleSubmit()}}>Check
+                                    onClick={() => {
+                                        handleSubmit()
+                                    }}>Check
                                 </button>
                             }
                         </div>

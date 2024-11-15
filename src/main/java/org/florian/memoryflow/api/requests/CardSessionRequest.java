@@ -1,3 +1,3 @@
 package org.florian.memoryflow.api.requests;
 
-public record CardSessionRequest(int[] card_ids){}
+public record CardSessionRequest(String[] card_ids){}

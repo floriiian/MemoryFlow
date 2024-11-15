@@ -4,14 +4,14 @@ import java.util.HashMap;
 
 public class FlashcardSession {
 
-    HashMap<Integer, String> flashcards = new HashMap<>();
+    HashMap<String, HashMap<String, String>> flashcards = new HashMap<>();
     int mistakes = 0;
     int correct = 0;
 
     public FlashcardSession() {
     }
 
-    public FlashcardSession(HashMap<Integer, String> flashcards) {
+    public FlashcardSession(HashMap<String, HashMap<String, String>> flashcards) {
         this.flashcards = flashcards;
     }
 
@@ -39,11 +39,11 @@ public class FlashcardSession {
         return mistakes;
     }
 
-    public HashMap<Integer, String> getFlashcards() {
+    public HashMap<String, HashMap<String, String>> getFlashcards() {
         return flashcards;
     }
 
-    public void setFlashcards(HashMap<Integer, String> flashcards) {
+    public void setFlashcards(HashMap<String, HashMap<String, String>> flashcards) {
         this.flashcards = flashcards;
     }
 

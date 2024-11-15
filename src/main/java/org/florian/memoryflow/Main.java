@@ -132,7 +132,6 @@ public class Main {
     }
 
     private static boolean verifySession(Context ctx) {
-
         String accessToken = ctx.cookie("sessionToken");
         String refreshToken = ctx.cookie("refreshToken");
 

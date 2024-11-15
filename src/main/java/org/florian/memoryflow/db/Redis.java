@@ -33,19 +33,17 @@ public class Redis {
         int user_id = Integer.parseInt(Login.getAccountIDByToken(ctx.cookie("sessionToken")));
         deleteFlashcardSession(user_id);
 
-        LOGGER.debug(requestedData);
-
         CardSessionRequest request = OBJECT_MAPPER.readValue(requestedData, CardSessionRequest.class);
-        int[] card_ids = request.card_ids();
+        String[] card_ids = request.card_ids();
         try (Jedis jedis = jedisPool.getResource()) {
-            Set<Integer> flashcardIDs = db.getAllFlashcardIDsFromUser(String.valueOf(user_id));
-            HashMap<Integer, String> flashcardData = new HashMap<>();
-            for (Integer card_id : card_ids) {
+            Set<String> flashcardIDs = db.getAllFlashcardIDsFromUser(String.valueOf(user_id));
+            HashMap<String, HashMap<String, String>> flashcardData = new HashMap<>();
+            for (String card_id : card_ids) {
                 if (!flashcardIDs.contains(card_id)) {
                     returnFailedRequest(ctx, "Unknown card id", user_id);
                     return;
                 }
-                flashcardData.put(card_id, db.getSolution(String.valueOf(card_id)));
+                flashcardData.put(card_id,  db.getQuestionAndSolution(String.valueOf(card_id)));
             }
             if (flashcardData.isEmpty()) {
                 returnFailedRequest(ctx, "No flashcards found", user_id);
@@ -70,27 +68,23 @@ public class Redis {
         int user_id = Integer.parseInt(Login.getAccountIDByToken(ctx.cookie("sessionToken")));
         try {
             String answer = jsonData.get("answer").asText();
-            int card_id = jsonData.get("card_id").asInt();
-
+            String card_id = jsonData.get("card_id").asText();
             FlashcardSession user_session = getFlashcardSession(user_id);
             if (user_session == null) {
                 returnFailedRequest(ctx, null, user_id);
                 return;
             }
-            HashMap<Integer, String> flashcards = user_session.getFlashcards();
-            String solution = flashcards.get(card_id);
-            if (solution == null) {
-                returnFailedRequest(ctx, "No solution found", user_id);
+
+            HashMap<String, HashMap<String, String>> flashcards = user_session.getFlashcards();
+            boolean solution = flashcards.get(card_id).containsValue(answer);
+            if (solution) {
+                user_session.addCorrect();
+                flashcards.remove((card_id));
             } else {
-                if (solution.equals(answer)) {
-                    user_session.addCorrect();
-                    flashcards.remove(card_id);
-                } else {
-                    user_session.addMistake();
-                    ctx.status(400);
-                }
-                updateFlashcardSession(user_id, user_session);
+                user_session.addMistake();
+                ctx.status(500);
             }
+            updateFlashcardSession(user_id, user_session);
         } catch (Exception e) {
             ctx.status(400);
             LOGGER.debug(e);
@@ -130,7 +124,7 @@ public class Redis {
     }
 
     private static boolean isRedisOffline() {
-        try (Jedis jedis = jedisPool.getResource()) {
+        try (Jedis _ = jedisPool.getResource()) {
             return false;
         } catch (Exception e) {
             LOGGER.debug("Redis is most likely offline.");

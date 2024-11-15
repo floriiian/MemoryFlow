@@ -161,16 +161,11 @@ public class Database {
         }
     }
 
-    public String getSolution(String card_id) {
-        String sql = "SELECT solution FROM flashcards WHERE card_id = ?";
+    public HashMap<String, String> getQuestionAndSolution(String card_id) {
+        String sql = "SELECT question,solution FROM flashcards WHERE card_id = ?";
         try (PreparedStatement preparedStmt = CONNECTION.prepareStatement(sql)) {
             preparedStmt.setString(1, card_id);
-            ResultSet results = preparedStmt.executeQuery();
-            if (!results.next()) {
-                return null;
-            } else {
-                return results.getString(1);
-            }
+            return getStringString(preparedStmt);
         } catch (Exception e) {
             LOGGER.debug(e);
             return null;
@@ -232,16 +227,16 @@ public class Database {
         }
     }
 
-    public Set<Integer> getAllFlashcardIDsFromUser(String user_id) {
+    public Set<String> getAllFlashcardIDsFromUser(String user_id) {
         String sql = "SELECT card_id FROM flashcards WHERE user_id = ?";
         try (PreparedStatement preparedStmt = CONNECTION.prepareStatement(sql)) {
             preparedStmt.setString(1, user_id);
             ResultSet result = preparedStmt.executeQuery();
 
-            Set<Integer> resultMap = new HashSet<>() {
+            Set<String> resultMap = new HashSet<>() {
             };
             while (result.next()) {
-                resultMap.add(result.getInt("card_id"));
+                resultMap.add(result.getString("card_id"));
             }
             return resultMap.isEmpty() ? null : resultMap;
         } catch (Exception e) {
@@ -281,6 +276,28 @@ public class Database {
             return resultList.isEmpty() ? null : resultList;
         }
     }
+
+    @Nullable
+    private HashMap<String, String> getStringString(PreparedStatement preparedStmt) throws SQLException {
+        try (ResultSet results = preparedStmt.executeQuery()) {
+            HashMap<String, String> resultList = new HashMap<>();
+            ResultSetMetaData metadata = results.getMetaData();
+
+            int columnCount = metadata.getColumnCount();
+            while (results.next()) {
+                for (int i = 1; i <= columnCount; i += 2) {
+                    String question = results.getString(i);
+                    String answer = results.getString(i + 1);
+                    resultList.put(question, answer);
+                }
+            }
+            return resultList.isEmpty() ? null : resultList;
+        }
+    }
+
+
+
+
 
     private HashMap<String, Integer> getStringIntegerHashMap(PreparedStatement preparedStmt) throws SQLException {
         try (ResultSet results = preparedStmt.executeQuery()) {

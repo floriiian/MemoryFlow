@@ -20,22 +20,20 @@ button:focus{
     min-width: 300px;
     max-width: 200px;
     height: auto;
-    padding: 30px;
+    width: 100%;
+    padding: 50px;
     border: 3px solid rgba(255, 255, 255, .25);
     border-radius: 20px;
     background-color: #353755;
     box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.25);
-    backdrop-filter: blur(15px);
     margin: 5px;
-    flex-direction: column;
-    justify-content: center;
     align-items: center;
     text-align: center;
 }
 
 .card__field {
     width: 80%;
-    padding: 20px;
+    padding: 10px;
     color: #1a1a1a;
     background-color: rgb(241, 241, 241);
     backdrop-filter: blur(15px);
@@ -54,9 +52,10 @@ button:focus{
     color: white;
     position: relative;
     font-weight: bold;
-    font-size: 100px;
+    font-size: 1.5em;
     top: 20px;
     left: 50%;
+    padding: 3em;
     transform: translateX(-50%);
 }
 
@@ -202,24 +201,31 @@ button:focus{
 }
 
 .selectbutton {
-    background-color: #bebcf0;
-    box-shadow: none;
-    color: #131f24;
-    border-bottom: 6px solid rgb(154, 153, 177);
-    width: 340px;
+    width: 15em;
     margin: 5px;
+    padding: 1em 0;
+    font-size: 1em;
+    background-color: #647eff;
+    color: #fbfbfb;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 0.3em #4d5fc3;
+    cursor: pointer;
+    transition: 0.1s;
+    text-transform: uppercase;
 }
 .exit_button {
     margin: 5px;
     width: 240px;
+    font-size: 1em;
     color: #ba4748;
     background-color: transparent;
     box-shadow: none;
+    text-transform: uppercase;
 }
 
 .btn.selectbutton:hover {
-    background-color: #c9c7f8;
-    box-shadow: none; /* This will overwrite .btn:hover */
+    background-color: #7388f7;
 }
 
 .btn.selectbutton:active {
@@ -572,6 +578,7 @@ button:focus{
     margin-bottom: 150px;
 }
 
+
 .button-wrapper {
     display: flex;
     gap: 27vw;
@@ -590,7 +597,6 @@ button:focus{
     width: 200px;
     height: 200px;
     transform: translateX(-60%) translateY(12%);
-    visibility: hidden;
 }
 .footer-headline {
     position: absolute;
@@ -598,23 +604,19 @@ button:focus{
     transform: translateX(20px);
     bottom: 65%;
     font-weight: 900;
-    visibility: hidden;
-
     font-size: 25px;
     color: #d64747;
 }
-.footer-information{
+.footer-solution {
     position: absolute;
     left: 35%;
     transform: translateX(20px);
-    bottom: 48%;
-    font-weight: 100;
-    visibility: hidden;
-
+    bottom: 65%;
+    margin: 0;
+    font-weight: 900;
     font-size: 18px;
     color: #d64747;
 }
-
 
 .dot {
     height: 87px;
@@ -672,21 +674,35 @@ button:focus{
 }
 
 .check-button {
+    background-color: #647eff;
+    color: #fbfbfb;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 0.1em #4d5fc3;
+}
+
+.check-button:hover {
+    background-color: #6f85f7;
+}
+
+.check-button.disabled {
     pointer-events: none;
     background-color: #37444d;
     color: #455560;
     border: none;
 }
 
+.check-button.continue{
+    background-color: #d44646;
+    color: #21253d;;
+    box-shadow: 0 0.1em #c73333;
+}
+
 .skip-button {
     background-color: transparent;
     color: #455560;
     border: 2px solid #37444d;
-    box-shadow: 0 3px 0 #37444d;
-}
-
-.check-button:hover {
-    background-color: #7e7ed4;
+    box-shadow: 0 2px 0 #37444d;
 }
 
 .skip-button:hover {
@@ -696,101 +712,10 @@ button:focus{
 .check-button:active,
 .skip-button:active {
     box-shadow: none;
-    transform: translateY(5px);
+    border: none;
+    transform: translateY(5%);
 }
 
-
-.language-button {
-    left: 80%;
-    top: 0.9em;
-    position: absolute;
-    height: 2em;
-    width: 3em;
-    border-radius: 10px;
-    border: #fdfdfd 3px solid;
-    z-index: 10;
-    cursor: pointer;
-}
-
-.language-button:hover {
-    box-shadow: 0 0 0 10px #202f36;
-}
-
-.dropdown-content {
-    cursor: pointer;
-    min-height: 20px;
-    overflow: hidden;
-    display: none;
-    position: absolute;
-    border-radius: 20px;
-    background-color: #131f24;
-    min-width: 160px;
-    font-size: 20px;
-    box-shadow: 0 0 0 2px #37444d;
-    top: 4.05em;
-    left: 81.6%;
-    transform: translateX(-50%);
-    z-index: 9;
-}
-
-.dropdown-triangle {
-    display: none;
-    position: absolute;
-
-    top: 3.2em; /* Use em for relative positioning */
-    left: 81.5%;
-    transform: translateX(-50%);
-    border-left: 10px solid transparent;
-    border-right: 10px solid transparent;
-    border-bottom: 10px solid #37444d;
-    z-index:10;
-}
-
-.dropdown-content a {
-    color: #ffffff;
-    padding: 12px 16px;
-    text-decoration: none;
-    display: block;
-}
-
-.dropdown-content a:hover {
-    background-color: #37444d;
-}
-
-.dropdown-content .dropdown_title {
-    font-weight: bold;
-    font-size: 15px;
-    color: #37444d;
-    box-shadow: 0 0 0 2px #37444d;
-}
-
-.dropdown-content .dropdown_title:hover {
-    background-color: #131f24;
-    cursor: default;
-}
-
-.language-select:hover .dropdown-content,
-.language-select:hover .dropdown-triangle,
-.dropdown-content:hover,
-.dropdown-triangle:hover {
-    display: block;
-}
-
-
-
-.language-avatar{
-    position: relative; /* or relative, depending on your layout */
-    height: 1em;
-    width: 1.5em;
-    margin-bottom: -2%;
-    border-radius: 5px;
-}
-.button__text {
-    position: relative; /* or relative, depending on your layout */
-    font-size: 18px;
-    font-weight: bold;
-    left: 0;
-}
 
 
 

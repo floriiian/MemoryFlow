@@ -19,7 +19,7 @@ const CompletionScreen = (props) => {
                     </div>
                 </div>
                 <div className="options">
-                    <button className="btn" onClick="restartQuiz()">
+                    <button className="btn" onClick={() => {props.redoQuiz()}}>
                         <span>Try again</span>
                     </button>
                     <a href="http://localhost:63342/JLearn/src/main/resources/public/startpage.html">

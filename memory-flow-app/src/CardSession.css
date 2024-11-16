@@ -25,7 +25,6 @@ button:focus {
     border: 3px solid rgba(255, 255, 255, .25);
     border-radius: 20px;
     background-color: #353755;
-    box-shadow: 0 0 10px 5px rgba(0, 0, 0, 0.25);
     margin: 5px;
     align-items: center;
     text-align: center;
@@ -36,12 +35,35 @@ button:focus {
     padding: 10px;
     color: #1a1a1a;
     background-color: rgb(241, 241, 241);
-    backdrop-filter: blur(15px);
     margin-top: 50px;
     border-radius: 10px;
     font-size: 16px;
     font-weight: bold;
     border: 3px solid rgb(192, 192, 192);
+}
+
+.card__field.error{
+    animation: cardFieldError 0.3s  ease-in;
+}
+
+@keyframes cardFieldError {
+    0%{
+        border: 3px solid rgb(192, 192, 192);
+        transform: rotate(0deg);
+    }
+    25%{
+        border: 3px solid rgb(255, 108, 108);
+        background-color: rgb(255, 91, 91);
+        transform: rotate(1deg);
+    }
+    50%{
+        transform: rotate(-1deg);
+    }
+    100%{
+        border: 3px solid rgb(192, 192, 192);
+        transform: rotate(0deg);
+    }
+
 }
 
 .card__field:focus, input:focus {
@@ -365,11 +387,11 @@ button:focus {
 /* Score */
 
 .arc {
-    border: 10px solid rgb(82, 82, 82);
+    border: 10px solid rgb(99, 125, 253);
 }
 
 .bg {
-    border: 10px solid rgb(99, 125, 253);
+    border: 10px solid rgb(82, 82, 82);
 }
 
 .container {
@@ -385,6 +407,7 @@ button:focus {
     height: 200%;
     box-sizing: border-box;
     border-radius: 50%;
+    transition: 0.5s;
 }
 
 .arc {
@@ -408,16 +431,6 @@ button:focus {
     text-align: center;
 }
 
-@keyframes slide {
-    from {
-        background-position: 0 0;
-    }
-    to {
-        background-position: -120px 60px;
-    }
-}
-
-
 .errorImage {
     width: 450px;
     bottom: 0;
@@ -431,7 +444,6 @@ button:focus {
 }
 
 .error-modal {
-
     position: absolute;
     font-weight: bold;
     left: 50%;
@@ -523,7 +535,7 @@ button:focus {
 
 .progress {
     position: relative;
-    background: #746ce2;
+    background: #637dfd;
     color: #fff;
     padding: 5px;
     height: 15px;
@@ -536,10 +548,10 @@ button:focus {
     border-radius: 10px;
     content: '';
     position: absolute;
-    top: 20%; /* Position vertically in the center */
+    top: 20%;
     width: 100%;
     height: 3px;
-    background: #7d7db7;
+    background: #7d92e7;
 }
 
 .progress-bar {
@@ -772,7 +784,7 @@ button:focus {
 }
 
 .skip-button:hover {
-    background-color: rgb(15, 27, 29);
+    background-color: rgb(24, 27, 43);
 }
 
 .check-button:active,

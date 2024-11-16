@@ -1,8 +1,4 @@
-import React, {useState} from "react";
-import errorIcon from '../assets/error.png'
-
-
-const ExitScreen = (props) => {
+const ExitScreen = () => {
     return (
         <>
         <div id="errorScreen">
@@ -12,7 +8,7 @@ const ExitScreen = (props) => {
                 <p className="errorDescription">
                     This is our fault,
                     you can try to reconnect or exit the quiz,
-                    either ways we'll try or best to fix this issue.
+                    either ways we'll try our best to fix this issue.
                 </p>
                 <div className="options">
                     <button className="btn selectbutton error" onClick={() => {

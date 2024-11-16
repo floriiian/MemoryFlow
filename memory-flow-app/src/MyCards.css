@@ -57,7 +57,7 @@
 }
 
 .flashcard-button {
-    position: fixed;
+    position: relative;
     border-radius: 10px;
     margin-top: 1em;
     width: 2.5em;
@@ -72,7 +72,7 @@
 }
 
 .flashcard-button.delete{
-    margin-left: 50px;
+    margin-left: 20px;
 }
 
 .flashcard-button img{
@@ -124,8 +124,6 @@
 .flashcard-amount::-webkit-scrollbar{
     display: none;
 }
-
-
 
 .error-message {
     position: absolute;

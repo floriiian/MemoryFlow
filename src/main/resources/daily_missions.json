@@ -2,32 +2,23 @@
   "daily_missions": {
     "0": {
       "type": "xp",
-      "amount": 20
+      "amount": 20,
+      "xp":200
     },
     "1": {
       "type": "answer",
-      "amount": 25
+      "amount": 25,
+      "xp": 150
     },
     "2": {
-      "type" : "answer_correctly",
-      "amount": 10
+      "type": "answer_correctly",
+      "amount": 10,
+      "xp": 100
     },
     "3": {
-      "type" : "answer_wrong",
-      "amount": 5
+      "type": "answer_wrong",
+      "amount": 5,
+      "xp": 125
     }
   }
 }
-
-// Table daily_missions: mission_id user_id progress
-/// User has to answer all cards from a stack
-// that he selects or auto generates.
-// Then at the end, it gets sent to the server
-// that evaluates the XP and such, which then gets directly
-// inserted into daily missions.
-// Maybe ill save the mission type e.g. (xp, cards) and then
-// fill in those values.
-// otherwise id have to load in the json into a giant variable, and then
-// grab the corresponding mission & see what type it is.
-// if xp-> add xp, otherwise add cards.
-

@@ -18,22 +18,18 @@ public class Leaderboard {
 
     private static final ArrayList<Competitor> currentLeaderboard = new ArrayList<>();
 
-    public static void addCompetitor(String userID, String earnedXP) {
-        if (userID == null || earnedXP == null) {
-            return;
-        }
+    public static void addAndUpdateCompetitor(int userID, int earnedXP) {
         try {
             if (db.getValue("leaderboard", "user_id", "user_id", userID) == null) {
                 db.insertValues(
                         "leaderboard",
                         new String[]{"user_id", "daily_xp"},
-                        new String[]{userID, earnedXP}
+                        new String[]{String.valueOf(userID), String.valueOf(earnedXP)}
                 );
             } else {
-
                 db.updateIncrementedValue(
                         "leaderboard", "daily_xp", "user_id",
-                        userID, Integer.parseInt(earnedXP));
+                        String.valueOf(userID), earnedXP);
             }
         } catch (Exception e) {
             LOGGER.debug(e);
@@ -61,12 +57,16 @@ public class Leaderboard {
     public static final Runnable getTopTenCompetitors = () -> {
         try {
             ArrayList<String> totalCompetitors = db.getAllValuesFromTable("leaderboard");
+            if(totalCompetitors == null) {
+                // No new competitors yet.
+                return;
+            }
             ArrayList<int[]> competitorPairs = new ArrayList<>();
 
             for (int i = 0; i < totalCompetitors.size(); i += 2) {
                 int accountId = Integer.parseInt(totalCompetitors.get(i));
                 int xp = Integer.parseInt(totalCompetitors.get(i + 1));
-                competitorPairs.add(new int[] { accountId, xp });
+                competitorPairs.add(new int[]{accountId, xp});
             }
             competitorPairs.sort((a, b) -> Integer.compare(b[1], a[1]));
 

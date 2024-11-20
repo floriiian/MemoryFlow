@@ -1,14 +1,12 @@
 package org.florian.memoryflow.missions;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.javalin.http.Context;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.florian.memoryflow.account.Login;
+import org.florian.memoryflow.account.Progression;
 import org.florian.memoryflow.api.responses.DailyMissionsResponse;
-import org.florian.memoryflow.api.responses.ErrorResponse;
 
 import org.florian.memoryflow.db.Database;
 
@@ -36,7 +34,7 @@ public class DailyMissions {
             String accountId = Login.getAccountIDByToken(ctx.cookie("sessionToken"));
             ArrayList<String> userMissionIDS = getDailyMissionsFromUser(accountId);
 
-            while (userMissionIDS == null) {
+            if (userMissionIDS == null) {
                 addDailyMission(accountId);
                 userMissionIDS = getDailyMissionsFromUser(accountId);
             }
@@ -57,42 +55,38 @@ public class DailyMissions {
         }
     }
 
-    public static void handleCompletion(boolean isLoggedIn, JsonNode jsonData, Context ctx) throws JsonProcessingException {
-
-        if (!isLoggedIn) {
-            ctx.status(500);
-            ctx.result(OBJECT_MAPPER.writeValueAsString(
-                    new ErrorResponse("Already logged in.")));
-            return;
-        }
+    public static void handleCompletion(int userID, long xp, int totalFlashcards, int correctCards, int wrongCards) {
         try {
-            int completedCards = jsonData.get("completed_cards").asInt();
-            int timeTaken = jsonData.get("time_taken").asInt();
-
-            if (timeTaken == 0 || completedCards == 0) {
-                invalidRequestResponse(ctx);
-                return;
-            }
-
-            String accountId = Login.getAccountIDByToken(ctx.cookie("sessionToken"));
-            ArrayList<String> userMissions = getDailyMissionsFromUser(accountId);
-
+            ArrayList<String> userMissions = getDailyMissionsFromUser(String.valueOf(userID));
             if (userMissions == null) {
-                ctx.status(500);
-                ctx.result(OBJECT_MAPPER.writeValueAsString(
-                        new ErrorResponse("No missions available yet.")));
+                LOGGER.debug("No active missions found.");
                 return;
             }
-
             for (String userMission : userMissions) {
                 Mission mission = Missions.daily_missions().get(userMission);
-                LOGGER.debug(mission.getType());
+
+                int missionGoal = mission.getAmount();
+                int missionProgress = mission.getProgress();
+
+                if (missionGoal == missionProgress) {
+                    return;
+                }
+
+                String type = mission.getType();
+                int usedVar = switch (type) {
+                    case "xp" -> (int) xp;
+                    case "answer" -> correctCards + wrongCards;
+                    case "answer_correctly" -> correctCards;
+                    case "answer_wrong" -> wrongCards;
+                    default -> 0;
+                };
+                if ((missionProgress + usedVar) >= missionGoal) {
+                    Progression.addXP(userID, mission.getXP());
+                    updateDailyMission(userID, userMission, missionGoal);
+                }
             }
-            LOGGER.debug(timeTaken);
-            LOGGER.debug(completedCards);
         } catch (Exception e) {
             LOGGER.debug(e);
-            invalidRequestResponse(ctx);
         }
 
     }
@@ -115,14 +109,21 @@ public class DailyMissions {
             Mission mission = Missions.daily_missions().get(randomMissionNum);
 
             db.insertValues("daily_missions",
-                    new String[]{"user_id","mission_id, type"},
+                    new String[]{"user_id", "mission_id, type"},
                     new String[]{userId, randomMissionNum, mission.getType()});
         }
     }
 
-    private static void invalidRequestResponse(Context ctx) throws JsonProcessingException {
-        ctx.status(500);
-        ctx.result(OBJECT_MAPPER.writeValueAsString(
-                new ErrorResponse("Invalid Request")));
+    private static void updateDailyMission(int userID, String missionID, int value) {
+        db.updateIncrementedValueWithTwo
+                ("daily_missions", "progress",
+                        "user_id", Integer.toString(userID),
+                        "mission_id", missionID,
+                        value
+                );
+    }
+
+    private static void removeDailyMission(int userID, String missionID) {
+        db.deleteValueWhereTwo("daily_missions", "user_id", String.valueOf(userID), "mission_id", missionID);
     }
 }

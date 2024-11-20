@@ -6,10 +6,13 @@ import io.javalin.http.Context;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.florian.memoryflow.account.Login;
+import org.florian.memoryflow.account.Progression;
 import org.florian.memoryflow.api.requests.CardSessionRequest;
 import org.florian.memoryflow.api.responses.ErrorResponse;
 
 import org.florian.memoryflow.api.responses.endFlashcardSessionResponse;
+import org.florian.memoryflow.leaderboard.Leaderboard;
+import org.florian.memoryflow.missions.DailyMissions;
 import org.florian.memoryflow.session.FlashcardSession;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -65,26 +68,26 @@ public class Redis {
             ctx.status(500);
             return;
         }
-        int user_id = Integer.parseInt(Login.getAccountIDByToken(ctx.cookie("sessionToken")));
+        int userID = Integer.parseInt(Login.getAccountIDByToken(ctx.cookie("sessionToken")));
         try {
             String answer = jsonData.get("answer").asText();
-            String card_id = jsonData.get("card_id").asText();
-            FlashcardSession user_session = getFlashcardSession(user_id);
-            if (user_session == null) {
-                returnFailedRequest(ctx, null, user_id);
+            String cardID = jsonData.get("card_id").asText();
+            FlashcardSession userSession = getFlashcardSession(userID);
+            if (userSession == null) {
+                returnFailedRequest(ctx, null, userID);
                 return;
             }
 
-            HashMap<String, HashMap<String, String>> flashcards = user_session.getFlashcards();
-            boolean solution = flashcards.get(card_id).containsValue(answer);
+            HashMap<String, HashMap<String, String>> flashcards = userSession.getFlashcards();
+            boolean solution = flashcards.get(cardID).containsValue(answer);
             if (solution) {
-                user_session.addCorrect();
-                flashcards.remove((card_id));
+                userSession.addCorrect();
+                flashcards.remove((cardID));
             } else {
-                user_session.addMistake();
-                ctx.status(500);
+                userSession.addMistake();
+                ctx.status(400);
             }
-            updateFlashcardSession(user_id, user_session);
+            updateFlashcardSession(userID, userSession);
         } catch (Exception e) {
             ctx.status(400);
             LOGGER.debug(e);
@@ -92,11 +95,11 @@ public class Redis {
     }
 
     public static void endFlashcardSession(Context ctx) throws Exception {
-        int user_id = Integer.parseInt(Login.getAccountIDByToken(ctx.cookie("sessionToken")));
+        int userID = Integer.parseInt(Login.getAccountIDByToken(ctx.cookie("sessionToken")));
 
-        FlashcardSession session = getFlashcardSession(user_id);
+        FlashcardSession session = getFlashcardSession(userID);
         if (session == null) {
-            returnFailedRequest(ctx, "No active session", user_id);
+            returnFailedRequest(ctx, "No active session", userID);
             return;
         }
         if(isRedisOffline()){
@@ -106,10 +109,14 @@ public class Redis {
 
         int correct = session.getCorrect();
         int mistakes = session.getMistakes();
+        int totalFlashcards  = session.getTotalFlashcards();
         long collectedXP = Math.min(Math.round(correct * 20 - (mistakes * 0.5)), 1000);
 
-        // TODO: Implement support for daily-missions.
-        deleteFlashcardSession(user_id);
+        DailyMissions.handleCompletion(userID, collectedXP, totalFlashcards, correct, mistakes);
+        Progression.addXP(userID, (int) collectedXP);
+        Leaderboard.addAndUpdateCompetitor(userID, (int) collectedXP);
+
+        deleteFlashcardSession(userID);
         ctx.status(200);
         ctx.contentType("application/json");
         ctx.result(OBJECT_MAPPER.writeValueAsString(new endFlashcardSessionResponse(correct, mistakes, collectedXP)));

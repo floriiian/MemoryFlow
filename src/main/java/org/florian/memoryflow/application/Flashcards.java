@@ -151,26 +151,6 @@ public class Flashcards {
         }
     }
 
-    public void updateFlashcard(String user_id, String card_id, String question, String solution, String category) {
-        String cardOwner = db.getValue("flashcards", "user_id", "card_id", card_id);
-
-        if (!cardOwner.equals(user_id)) {
-            LOGGER.debug("{} tried to edit card with id {}.", user_id, card_id);
-        } else {
-            if (!StringUtils.isBlank(question)) {
-                updateField("question", question, card_id);
-            }
-            if (!StringUtils.isBlank(solution)) {
-                updateField("solution", solution, card_id);
-            }
-            if (!StringUtils.isBlank(category)) {
-                updateField("category", category, card_id);
-            }
-            LOGGER.debug("Successfully updated: {}.", card_id);
-        }
-    }
-
-
     private static boolean checkFlashcardOwner(String user_id, String card_id) {
         if(card_id != null){
             String real_owner =  db.getValue("flashcards", "user_id",  "card_id", card_id);
@@ -178,10 +158,6 @@ public class Flashcards {
         } else {
             return false;
         }
-    }
-
-    private void updateField(String column, String value, String card_id) {
-        db.updateValues("flashcards", column, "card_id", card_id, value);
     }
 
     private static void checkSession(boolean validSession, Context ctx) throws Exception {

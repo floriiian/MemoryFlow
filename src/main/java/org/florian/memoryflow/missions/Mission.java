@@ -4,6 +4,7 @@ public class Mission {
     String type ;
     int amount;
     int progress;
+    int xp;
 
     public int getAmount() {
         return amount;
@@ -19,6 +20,14 @@ public class Mission {
 
     public void setProgress(int progress) {
         this.progress = progress;
+    }
+
+    public int getXP() {
+        return xp;
+    }
+
+    public void setXP(int xp) {
+        this.xp = xp;
     }
 
     public String getType() {

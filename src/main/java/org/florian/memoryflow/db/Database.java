@@ -1,19 +1,24 @@
 package org.florian.memoryflow.db;
 
+import kotlin.reflect.jvm.internal.impl.util.ArrayMap;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
 import java.sql.*;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
+
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+import org.florian.memoryflow.account.Progression;
+import org.florian.memoryflow.account.Streak;
 import org.ini4j.Ini;
 import org.jetbrains.annotations.Nullable;
 
@@ -92,6 +97,7 @@ public class Database {
         try (Statement stmt = CONNECTION.createStatement()) {
             stmt.executeUpdate("TRUNCATE TABLE leaderboard");
             stmt.executeUpdate("TRUNCATE TABLE daily_missions");
+            Progression.streakCheck();
             LOGGER.debug("Successfully reset database tables.");
         } catch (SQLException e) {
             LOGGER.error("Failed to reset database tables", e);
@@ -201,7 +207,6 @@ public class Database {
         }
     }
 
-
     public ArrayList<String> getAllValuesByType(String table, String column, String where, Object value) {
         String sql = "SELECT " + column + " FROM " + table + " WHERE " + where + " = ?";
 
@@ -258,6 +263,25 @@ public class Database {
         }
     }
 
+    public ArrayList<Streak> getStreaks() {
+        String sql = "SELECT user_id, streak, date FROM progress";
+        try (PreparedStatement preparedStmt = CONNECTION.prepareStatement(sql);
+             ResultSet results = preparedStmt.executeQuery()) {
+
+            ArrayList<Streak> resultList = new ArrayList<>();
+            while (results.next()) {
+                String user_id = results.getString("user_id");
+                int streak = results.getInt("streak");
+                long last_completion = results.getLong("date");
+                resultList.add(new Streak(user_id, streak, last_completion));
+            }
+            return resultList;
+        } catch (SQLException e) {
+            LOGGER.error("Error retrieving streaks from database", e);
+            return new ArrayList<>();
+        }
+    }
+
     @Nullable
     private HashMap<String, String[]> getStringArrayMap(PreparedStatement preparedStmt) throws SQLException {
         try (ResultSet results = preparedStmt.executeQuery()) {
@@ -294,10 +318,6 @@ public class Database {
             return resultList.isEmpty() ? null : resultList;
         }
     }
-
-
-
-
 
     private HashMap<String, Integer> getStringIntegerHashMap(PreparedStatement preparedStmt) throws SQLException {
         try (ResultSet results = preparedStmt.executeQuery()) {
@@ -343,9 +363,46 @@ public class Database {
         }
     }
 
+    public void updateStreak(String user_id) {
+        String sql = "UPDATE progress SET date = ?, streak = streak + ? WHERE user_id = ?";
+        try (PreparedStatement stmt = CONNECTION.prepareStatement(sql)) {
+            String currentDate = String.valueOf(Instant.now().getEpochSecond());
+            stmt.setString(1, currentDate);
+            stmt.setInt(2, 1);
+            stmt.setString(3, user_id);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.debug(e);
+        }
+    }
+
+    public void updateIncrementedValueWithTwo(String table, String column, String where,
+                                              String whereValue, String where2, String whereValue2, int value) {
+        String sql = "UPDATE " + table + " SET " + column + " = " + column + " + ? WHERE " + where + " = ? AND " + where2 + " = ?";
+        try (PreparedStatement stmt = CONNECTION.prepareStatement(sql)) {
+            stmt.setInt(1, value);
+            stmt.setString(2, whereValue);
+            stmt.setString(3, whereValue2);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.debug(e);
+        }
+    }
+
     public void deleteValue(String table, String where, Object value) {
         String sql = "DELETE FROM " + table + " WHERE " + where + " = ?";
         executeStatement(value, sql);
+    }
+
+    public void deleteValueWhereTwo(String table, String where, String whereValue1, String where2, String whereValue2) {
+        String sql = "DELETE FROM " + table + " WHERE " + where + " = ? AND " + where2 + " = ?";
+        try (PreparedStatement stmt = CONNECTION.prepareStatement(sql)) {
+            stmt.setString(1, whereValue1);
+            stmt.setString(2, whereValue2);
+            stmt.executeUpdate();
+        } catch (SQLException e) {
+            LOGGER.debug(e);
+        }
     }
 
     public Integer insertValues(String table, String[] columns, String[] values) {

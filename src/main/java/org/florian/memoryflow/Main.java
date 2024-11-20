@@ -8,6 +8,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import org.florian.memoryflow.account.Login;
+import org.florian.memoryflow.account.Progression;
 import org.florian.memoryflow.account.Register;
 import org.florian.memoryflow.account.UserData;
 
@@ -21,6 +22,9 @@ import org.florian.memoryflow.db.Redis;
 import org.florian.memoryflow.leaderboard.Leaderboard;
 import org.florian.memoryflow.missions.DailyMissions;
 
+import javax.xml.crypto.Data;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
@@ -41,7 +45,6 @@ public class Main {
 
         Database db = Database.getInstance();
         Javalin app = Javalin.create().start(8888);
-
         db.startDatabase();
         final ScheduledFuture<?> leaderboardHandler = scheduler.scheduleAtFixedRate(
                 Leaderboard.getTopTenCompetitors, 0, 60, SECONDS);
@@ -64,7 +67,6 @@ public class Main {
         app.get("/get/card_session/end", ctx -> handleGetRequest("/get/card_session/end", ctx));
     }
 
-
     private static void handleGetRequest(String path, Context ctx) throws Exception {
 
         boolean isValidSession = verifySession(ctx);
@@ -78,7 +80,7 @@ public class Main {
                 case "/get/userdata":
                     UserData.handleUserDataRequest(ctx);
                     break;
-                case "/get/leaderboard":
+                 case "/get/leaderboard":
                     Leaderboard.handleLeaderboardRequest(ctx);
                     break;
                 case "/get/daily_missions":
@@ -104,9 +106,6 @@ public class Main {
                 break;
             case "/register":
                 handleLogin(isValidSession, jsonData, ctx, PostRequestType.REGISTER);
-                break;
-            case "/complete":
-                DailyMissions.handleCompletion(isValidSession, jsonData, ctx);
                 break;
             case "/add_card":
                 Flashcards.handleFlashcardAdd(isValidSession, jsonData, ctx);

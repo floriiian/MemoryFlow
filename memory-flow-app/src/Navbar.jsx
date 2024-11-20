@@ -37,7 +37,7 @@ function Navbar() {
     const [dailyGoalPercentage, setDailyGoalPercentage] = useState("0em");
     const [dailyGoalText, setDailyGoalText] = useState("0/0");
     const [dailyGoalDescription, setDailyGoalDescription] = useState("");
-    const [leaderboardTime, setLeaderboardTime] = useState("00h 00m 00s");
+    const [leaderboardTime, setLeaderboardTime] = useState("Hold on..");
 
     const [levelText, setLevelText] = useState("1");
     const [streakText, setStreakText] = useState("0");

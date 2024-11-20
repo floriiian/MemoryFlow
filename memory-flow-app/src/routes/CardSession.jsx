@@ -130,12 +130,12 @@ function CardSession() {
     }
 
     function drawScore(val = 0, percent, arcReference) {
-        if (val <= percent / 100) {
+        while (val <= percent / 100) {
             let angle = val * (180 - 45);
             if (arcReference && arcReference.current) {
                 arcReference.current.style.transform = "rotate(" + angle + "deg)";
             }
-            val += 0.005;
+            val += 0.01;
             requestAnimationFrame(() => drawScore(val, percent, arcReference));
         }
     }

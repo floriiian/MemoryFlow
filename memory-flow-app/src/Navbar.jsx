@@ -1,7 +1,7 @@
 import './Navbar.css';
 import './index.css'
 import myCardsLogo from './assets/sidebar-icons/home.png';
-import loginLogo from './assets/sidebar-icons/user.png';
+import logoutLogo from './assets/sidebar-icons/logout.png';
 import downloadLogo from './assets/sidebar-icons/download.png';
 import addCardLogo from './assets/sidebar-icons/add.png';
 import {useEffect, useRef, useState} from "react";
@@ -156,16 +156,16 @@ function Navbar() {
                         </li>
                         <li className={selectedButton?.includes("download_cards") ? "active" : ""}>
                             <i></i>
-                            <div className={"icon"} onClick={() => redirectToPage("download_cards")}>
+                            <div className={"icon"} onClick={() => redirectToPage("get_cards")}>
                                 <img alt="Download cards logo" src={downloadLogo}/>
                                 <span>Get Cards</span>
                             </div>
                         </li>
                         <li className={selectedButton?.includes("login") ? "active" : ""}>
                             <i></i>
-                            <div className={"icon"} onClick={() => redirectToPage("login")}>
-                                <img alt="Download cards logo" src={loginLogo}/>
-                                <span>Profile</span>
+                            <div className={"icon"} onClick={() => redirectToPage("logout")}>
+                                <img alt="Download cards logo" src={logoutLogo}/>
+                                <span>Logout</span>
                             </div>
                         </li>
                     </ul>

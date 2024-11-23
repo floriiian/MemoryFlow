@@ -1,4 +1,4 @@
-import {Form, Link, redirect, useNavigate, useSubmit} from "react-router-dom";
+import {Form, useNavigate} from "react-router-dom";
 import React, {useEffect, useRef, useState} from "react";
 import ReactDOM from "react-dom/client";
 import {hideFormHint, showFormHint} from "../handlers/accountHandlers.jsx";
@@ -53,19 +53,20 @@ function AddCards() {
         }
 
         const cards = [];
-        const categoryCards = {}
+        let categoryCards = {}
 
         getData("get/card_categories").then((response) => {
             const categories = response["categories"];
 
             let currentEntry = 0;
-            for (const [category, amount] of Object.entries(categories)) {
-                categoryCards[currentEntry] = {name: category, amount: amount};
-                currentEntry++;
-            }
-            categoryCards[currentEntry] = {name: "", type: "add"};
+            categoryCards = Object.entries(response.categories).map(([name, [amount, visibility]]) => ({
+                name,
+                amount,
+                visibility
+            }));
         }).then(
             () => {
+                categoryCards[categoryCards.size +1 ] = {name: "", type: "add"};
                 Object.entries(categoryCards).forEach(([key, category]) => {
                     let categoryElement = (
                         <FlashCardCategory
@@ -74,6 +75,7 @@ function AddCards() {
                             amount={category.amount}
                             type={category.type}
                             setCategory={setCategory}
+                            visibilityButtons={false}
                             switchToCategoryState={switchToCategoryState}
                             redirect={navigate}
                         />

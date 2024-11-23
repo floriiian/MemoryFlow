@@ -18,11 +18,17 @@ function CardCategories() {
             setLoading(true);
             try {
                 const response = await getData("get/card_categories");
-                const categoriesList = Object.entries(response.categories).map(([name, amount]) => ({
+                const categoriesList = Object.entries(response.categories).map(([name, [amount, visibility]]) => ({
                     name,
                     amount,
+                    visibility
                 }));
                 setCategories(categoriesList);
+
+                for (const category of categoriesList) {
+                    console.log(category.visibility)
+                }
+
                 if(categoriesList.length === 0) {
                     setErrorMessage("You don't have any cards yet,");
                     showRedirectLink(true);
@@ -34,7 +40,7 @@ function CardCategories() {
                 setLoading(false);
             }
         };
-        fetchCategories();
+        fetchCategories().then(r =>"" );
     }
 
     useEffect(() => {
@@ -44,7 +50,7 @@ function CardCategories() {
 
     return (
         <div className="baseBody">
-            {location.pathname === "/my_cards" && ( // Render categories only on /my_cards route
+            {location.pathname === "/my_cards" && (
                 <div className="flashcardsContainer">
                     {loading ? (
                         <p>Loading...</p>
@@ -55,10 +61,13 @@ function CardCategories() {
                                 card_type={"flashcard"}
                                 name={category.name}
                                 amount={category.amount}
+                                visibility={category.visibility}
                                 type={"redirect"}
-                                redirect={(cat) => navigate(`${cat}`)} // Redirect function
+                                visibilityButtons={true}
+                                redirect={(cat) => navigate(`${cat}`)}
                             />
-                        ))
+                        )
+                        )
                     )}
                 </div>
             )}

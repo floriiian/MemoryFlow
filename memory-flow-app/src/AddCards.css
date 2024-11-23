@@ -28,6 +28,30 @@
     animation: pageReveal 0.2s;
     transition: 2s ;
 }
+.get-cards-header{
+    position: absolute;
+    margin-bottom: 14.5em;
+    font-size: 1.8em;
+}
+.get-cards-search-bar {
+    margin-bottom: 21em;
+    width: 37em;
+    height: 3em;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    background: #292a39;
+    caret-color: #95a6ff;
+    box-shadow: 0 0 0 0.1em #55586f;
+    padding-inline: 22px;
+    font-size: 14px;
+    font-weight: bold;
+    transition: 0.2s ;
+}
+
+.get-cards-search-bar:focus {
+    box-shadow: 0 0 0 0.1em #95a6ff;
+}
 
 .add-card-input {
     caret-color: #95a6ff;

@@ -1,0 +1,24 @@
+{
+  "daily_missions": {
+    "0": {
+      "type": "xp",
+      "amount": 20,
+      "xp":200
+    },
+    "1": {
+      "type": "answer",
+      "amount": 25,
+      "xp": 150
+    },
+    "2": {
+      "type": "answer_correctly",
+      "amount": 10,
+      "xp": 100
+    },
+    "3": {
+      "type": "answer_wrong",
+      "amount": 5,
+      "xp": 125
+    }
+  }
+}

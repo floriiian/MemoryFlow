@@ -1,4 +1,4 @@
-import React, {useEffect, useRef, useState} from "react";
+import React, {useEffect, useState} from "react";
 import publicIcon from "../assets/public.png";
 import downloadIcon from "../assets/sidebar-icons/download.png";
 import AddIcon from '../assets/sidebar-icons/add.png'
@@ -7,6 +7,8 @@ import {postRequest} from "../api/Requests.jsx";
 
 const FlashCardCategory = (props) => {
     const [isVisible, toggleVisibility] = useState(false)
+    const [isHidden, toggleHideCategory] = useState(false)
+    const [categoryError, toggleCategoryError] = useState(false);
 
     useEffect(() => {
         toggleVisibility(props.visibility);
@@ -29,11 +31,8 @@ const FlashCardCategory = (props) => {
         }
     }
     return (
-        <div
-            key={props.name}
-            className={"flashcard"}
-            onClick={() => handleClick()}
-        >
+
+        <div key={props.name} className={"flashcard"} onClick={() => handleClick()} style={{display: isHidden ? "none" : "block"}}>
             <div className="inner-flashcard">
                 <p className="flashcard-c-category">{props.name}</p>
                 <h1 className="flashcard-c-amount">{props.type === "add" ? "" : props.amount + " Cards"}</h1>
@@ -49,7 +48,6 @@ const FlashCardCategory = (props) => {
                                     "category": props.name,
                                     "visibility": !isVisible
                                 });
-                                console.log(response)
                             } catch (error) {
                                 console.error(error);
                             }
@@ -61,22 +59,25 @@ const FlashCardCategory = (props) => {
                     <img alt="Toggle public" src={publicIcon}/>
                 </button> : null}
                 {props.downloadButtons === true ? <button
-                    className={"flashcard-button"}
+                    className={categoryError ? "flashcard-button error" : "flashcard-button"}
                     onClick={(e) => {
                         e.stopPropagation();
                         const fetchCards = async () => {
                             try {
-                                const response = await postRequest("download/category", {
+                                return await postRequest("download/category", {
                                     "category": props.name,
-                                    "id": props.id
+                                    "card_id": props.card_id
                                 });
-                                console.log(response)
                             } catch (error) {
-                                console.error(error);
+                                return error;
                             }
                         };
-                        fetchCards().then(() => {
-                            props.removeCategory(props.cardKey);
+                        fetchCards().then((r) => {
+                            if(r.status !== undefined && r.status === 500) {
+                                toggleCategoryError(true)
+                            } else {
+                                toggleHideCategory(true);
+                            }
                         });
                     }}>
                     <img alt="Download icon" src={downloadIcon}/>

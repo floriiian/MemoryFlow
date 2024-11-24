@@ -79,7 +79,6 @@ function EditCard() {
                 });
         } else {
             displayResults(result)
-            console.log(result)
         }
     };
 
@@ -92,7 +91,6 @@ function EditCard() {
             setHint2Text(result)
             showFormHint(toggleHint2)
         } else {
-            console.log("Triggered: " + result)
             setServerHintText(result);
             showFormHint(toggleServerHint);
         }

@@ -49,12 +49,9 @@ function Login() {
                 "password": formData.password
             })
                 .then(response => {
-                    console.log("Success Response:", response);
                     navigate("/my_cards");
                 })
                 .catch(error => {
-                    console.error("Error Status Code:", error.status);
-                    console.error("Error Message:", error.message);
                     result = error.message;
 
                     displayResults(result)

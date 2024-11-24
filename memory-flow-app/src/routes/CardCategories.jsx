@@ -24,11 +24,6 @@ function CardCategories() {
                     visibility
                 }));
                 setCategories(categoriesList);
-
-                for (const category of categoriesList) {
-                    console.log(category.visibility)
-                }
-
                 if(categoriesList.length === 0) {
                     setErrorMessage("You don't have any cards yet,");
                     showRedirectLink(true);

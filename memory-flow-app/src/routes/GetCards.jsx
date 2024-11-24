@@ -17,10 +17,6 @@ function GetCards() {
     const flashcardContainerRef = useRef(null);
     const [cardsLoaded, setCardsLoaded] = useState(false);
 
-    function removeCategory(cardKey) {
-        console.log("Removing.." + cardKey);
-    }
-
     function loadCategoriesByQuery(query) {
         const cards = [];
         let categoryCards = {}
@@ -47,7 +43,6 @@ function GetCards() {
                             visibilityButtons={false}
                             downloadButtons={true}
                             redirect={navigate}
-                            removeCategory={removeCategory}
                         />
                     );
                     cards.push(categoryElement);

@@ -64,7 +64,7 @@ function Cards() {
 
             }
         };
-        fetchCards().then(r => console.log("Cards loaded"));
+        fetchCards();
     }
 
     const hasRun = useRef(false);

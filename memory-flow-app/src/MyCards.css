@@ -43,7 +43,7 @@
     animation: cardSelect 0.1s ease-in;
 }
 
-.flashcard:hover{
+.flashcard:hover {
     background: rgb(62, 62, 98);
     cursor: pointer;
 
@@ -76,22 +76,40 @@
     filter: grayscale(100%);
 }
 
-.flashcard-button.delete{
+.flashcard-button.delete {
     margin-left: 20px;
 }
 
-.flashcard-button img{
+.flashcard-button.error {
+    filter: opacity(0.1);
+    pointer-events: none;
+    animation: 1s flashcardButtonError;
+}
+
+@keyframes flashcardButtonError {
+    0% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+
+.flashcard-button img {
     width: 1.4em;
     pointer-events: none;
 }
 
 
-.flashcard-button:hover{
+.flashcard-button:hover {
     background: rgb(100, 101, 153);
     cursor: pointer;
 }
 
-.flashcard-button:active{
+.flashcard-button:active {
     outline: none;
     border: none;
     cursor: pointer;
@@ -99,7 +117,8 @@
     box-shadow: 0 0.02em 0 0.1em #7276a4;
     transform: translateY(0.1em);
 }
-.flashcard-button:focus{
+
+.flashcard-button:focus {
     outline: none;
 }
 
@@ -126,7 +145,7 @@
     overflow-x: hidden;
 }
 
-.flashcard-amount::-webkit-scrollbar{
+.flashcard-amount::-webkit-scrollbar {
     display: none;
 }
 
@@ -140,7 +159,8 @@
     transform: translate(-50%, -50%);
     text-align: center;
 }
-.redirectLink.add-cards{
+
+.redirectLink.add-cards {
     margin: 0;
     font-size: 1em;
 }
@@ -171,17 +191,17 @@
     box-shadow: none;
 }
 
-.session-start-btn:focus{
+.session-start-btn:focus {
     outline: none;
 }
 
-.session-start-btn.disabled{
+.session-start-btn.disabled {
     opacity: 0.1;
     pointer-events: none;
 }
 
 @keyframes cardsAppear {
-    0%  {
+    0% {
         opacity: 0;
         filter: brightness(1);
     }
@@ -196,7 +216,7 @@
 }
 
 @keyframes cardSelect {
-    0%  {
+    0% {
         box-shadow: 0 1px 1px 3px #88aaea;
         transform: scale(1);
     }
@@ -212,7 +232,7 @@
 }
 
 @keyframes buttonHold {
-    0%  {
+    0% {
         transform: scale(1);
     }
     50% {

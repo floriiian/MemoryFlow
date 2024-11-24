@@ -161,9 +161,15 @@ function Navbar() {
                                 <span>Get Cards</span>
                             </div>
                         </li>
-                        <li className={selectedButton?.includes("login") ? "active" : ""}>
+                        <li className={selectedButton?.includes("logout") ? "active" : ""}>
                             <i></i>
-                            <div className={"icon"} onClick={() => redirectToPage("logout")}>
+                            <div className={"icon"}
+                                 onClick={() => {
+                                     getData("logout").then(r =>
+                                        redirectToPage("/index")
+                                     )
+                                 }
+                            }>
                                 <img alt="Download cards logo" src={logoutLogo}/>
                                 <span>Logout</span>
                             </div>

@@ -9,10 +9,6 @@ import chemistryIcon from '../assets/login-icons/chemistry.png';
 import hintIcon from '../assets/hint_icon.png';
 
 import '../Login.css'
-
-
-// TODO: Implement client-sided checks to validate information before sending it to the server
-
 function Register() {
 
     const [formData, setFormData] = useState({
@@ -50,12 +46,9 @@ function Register() {
                 "password": formData.password
             })
                 .then(response => {
-                    console.log("Success Response:", response);
                     navigate("/login");
                 })
                 .catch(error => {
-                    console.error("Error Status Code:", error.status);
-                    console.error("Error Message:", error.message);
                     result = error.message;
 
                     displayResults(result)

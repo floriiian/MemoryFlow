@@ -52,11 +52,9 @@ function CardSession() {
                         setFlashcards(response["flashcards"]);
                     })
                     .catch((error) => {
-                        console.log(error);
                         toggleErrorScreen(true);
                     });
             } catch (error) {
-                console.log(error);
                 toggleErrorScreen(true);
             }
         }
@@ -108,21 +106,18 @@ function CardSession() {
                 try {
                     getRequest("get/card_session/end")
                         .then((response) => {
-                            toggleCompleted(true);
                             let correct = response["correct"];
                             let mistakes = response["mistakes"];
-                            let xp = response["xp"];
                             let percentage = Math.round(
                                 Math.min((correct / (correct + mistakes)) * 100, 100)
                             );
                             setKnowledgePercent(percentage);
+                            toggleCompleted(true);
                         })
-                        .catch((error) => {
-                            console.log(error);
+                        .catch(() => {
                             toggleErrorScreen(true);
                         });
                 } catch (error) {
-                    console.log(error);
                     toggleErrorScreen(true);
                 }
             }
@@ -176,7 +171,6 @@ function CardSession() {
                             }
                         });
                 } catch (error) {
-                    console.log(error);
                     toggleErrorScreen(true);
                 }
             }

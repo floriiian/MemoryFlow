@@ -108,22 +108,19 @@ function AddCards() {
                 "question": formData.question,
                 "solution": formData.solution
             })
-                .then(response => {
+                .then(_ => {
                     navigate("/my_cards");
                 })
                 .catch(error => {
-                    console.error("Error Status Code:", error.status);
-                    console.error("Error Message:", error.message);
                     result = error.message;
-                    displayResults(result)
+                    displayRes(result)
                 });
         } else {
-            displayResults(result)
-            console.log(result)
+            displayRes(result)
         }
     };
 
-    function displayResults(result) {
+    function displayRes(result) {
         const lowerCaseResult = result.toLowerCase();
         if (lowerCaseResult.includes("question")) {
             setHint1Text(result)
@@ -134,7 +131,6 @@ function AddCards() {
             showFormHint(toggleHint2)
         }
         else{
-            console.log("Triggered: " +  result)
             setServerHintText(result);
             showFormHint(toggleServerHint);
         }

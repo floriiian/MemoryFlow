@@ -1,9 +1,8 @@
-# Memoryflow: A Gamified Flashcard Learning Experience
-
+# Memoryflow: A Flashcard web app
 ## Features
 
 * **Personalized Learning:** Create and customize your own flashcards.
-* **Community-Powered:** Access and contribute to a growing library of public flashcards.
+* **Community-Powered:** Access or contribute to database of public flashcards.
 * **Gamification:** Stay motivated with streaks, levels, XP, and daily leaderboards.
 * **Secure Accounts:** Robust JWT authentication for secure access.
 

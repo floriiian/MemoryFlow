@@ -19,7 +19,8 @@ Memoryflow is a web application centered around flashcards.
 ### 1. Environment Variables  
 Set the `jTokenKey` environment variable in your terminal:  
 ```bash  
-SET jTokenKey=yourkey  
+SET jTokenKey=yourkey
+```
 
 ![loginScreen](https://iili.io/2aBzFQ2.png)
 ![startScreen](https://iili.io/2aBzHkG.png)

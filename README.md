@@ -10,6 +10,7 @@ configure it to your liking and modify the values inside the Redis class.
 
 If you're running this locally you'll have to disable Chrome's CORS restrictions 
 / start Chrome without CORS, this will allow you to send and receive POST/GET requests.
+
 This is possible with this command: 
 ``"C:\Program Files\Google\Chrome\Application\chrome.exe" --disable-web-security --disable-gpu --user-data-dir=%LOCALAPPDATA%\Google\chromeTemp``. 
 Of course only if you've installed Chrome in that directory.

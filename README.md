@@ -1,26 +1,29 @@
-# Memoryflow  
-Memoryflow is a web application centered around flashcards.  
+# Memoryflow: A Gamified Flashcard Learning Experience
 
-## Features  
-- **Custom Flashcards**: Create your own flashcards.  
-- **Public Flashcards**: Access public flashcards created by other users.  
-- **Gamification**:  
-  - Streaks  
-  - Levels  
-  - XP system  
-  - Daily leaderboard  
-- **Fully Functional Account System**:  
-  - Secured with **JWT Authentication**.  
+## Features
 
----
+* **Personalized Learning:** Create and customize your own flashcards.
+* **Community-Powered:** Access and contribute to a growing library of public flashcards.
+* **Gamification:** Stay motivated with streaks, levels, XP, and daily leaderboards.
+* **Secure Accounts:** Robust JWT authentication for secure access.
 
-## Setup Instructions  
+## Getting Started
 
-### 1. Environment Variables  
-Set the `jTokenKey` environment variable in your terminal:  
-```bash  
-SET jTokenKey=yourkey
-```
+1. **Environment Setup:**
+   * Set the `jTokenKey` environment variable: `SET jTokenKey=yourkey`
+   * Ensure a running Redis container: Refer to the Redis Docker Image documentation.
+   * Configure Redis connection details in the source code.
+
+2. **Local Development:**
+   * **Disable Chrome CORS (for development only):**
+     ```bash
+     "C:\Program Files\Google\Chrome\Application\chrome.exe" --disable-web-security --disable-gpu --user-data-dir=%LOCALAPPDATA%\Google\chromeTemp"
+     ```
+   * **Run the Application:**
+     Start the `Main.java` and React web server.
+
+## Note
+Disabling Chrome CORS is a development-only workaround. For production, implement proper CORS configuration.
 
 ![loginScreen](https://iili.io/2aBzFQ2.png)
 ![startScreen](https://iili.io/2aBzHkG.png)

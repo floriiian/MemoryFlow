@@ -195,14 +195,41 @@ public class Flashcards {
             return;
         }
         String query = jsonData.get("query").asText();
+        String user_id = Login.getAccountIDByToken(ctx.cookie("sessionToken"));
 
-        if(query != null) {
+        if (query != null) {
             ctx.status(200);
             ctx.contentType("application/json");
-            ctx.result(OBJECT_MAPPER.writeValueAsString(new CardCategoriesResponse(db.queryForCategory(query))));
+            ctx.result(OBJECT_MAPPER.writeValueAsString(new CardCategoriesResponse(db.queryForCategory(user_id, query))));
         } else {
             returnFailedRequest(ctx, "No query given.");
         }
     }
 
+    public static void duplicateFlashcardCategory(boolean validSession, JsonNode jsonData, Context ctx) throws Exception {
+        if (isSessionInvalid(validSession, ctx)) {
+            return;
+        }
+        String category;
+        String card_id;
+        try {
+            category = jsonData.get("category").asText();
+            card_id = jsonData.get("card_id").asText();
+            String user_id = Login.getAccountIDByToken(ctx.cookie("sessionToken"));
+
+            if (db.getValueWith2Conditions("flashcards",
+                    "category", "user_id", user_id,
+                    "category", category) != null) {
+                LOGGER.debug("User tried to request existing category.");
+                returnFailedRequest(ctx, "Category already exists.");
+            } else {
+                db.copyPasteCategory(card_id, category, user_id);
+                ctx.contentType("application/json");
+                ctx.result("");
+                ctx.status(200);
+            }
+        } catch (Exception _) {
+            returnFailedRequest(ctx, "Invalid category.");
+        }
+    }
 }

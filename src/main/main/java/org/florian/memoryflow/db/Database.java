@@ -332,17 +332,19 @@ public class Database {
         }
     }
 
-    public HashMap<String, Object[]> queryForCategory(String query) {
+    public HashMap<String, Object[]> queryForCategory(String user_id, String query) {
         String sql = "SELECT MIN(card_id) as card_id, category, COUNT(*) as entry_count " +
                 "FROM flashcards " +
                 "WHERE LOWER(category) LIKE ? " +
                 "AND visibility = 'true' " +
+                "AND user_id != ?" +
                 "GROUP BY category";
 
         HashMap<String, Object[]> resultMap = new HashMap<>();
         try (PreparedStatement stmt = CONNECTION.prepareStatement(sql)) {
             LOGGER.debug("Executing SQL with query: '%{}%'", query.trim());
             stmt.setString(1, "%" + query.trim() + "%");
+            stmt.setString(2, user_id);
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
                     String category = rs.getString("category");
@@ -471,6 +473,24 @@ public class Database {
             LOGGER.debug(e);
         }
         return -1;
+    }
+
+    public void copyPasteCategory(String cardID, String category, String newUserID) {
+        String sql = "INSERT INTO flashcards (user_id, category, question, solution) " +
+                "SELECT ?, category, question, solution " +
+                "FROM flashcards " +
+                "WHERE user_id = (SELECT user_id FROM flashcards WHERE card_id = ?) " +
+                "AND category = (SELECT category FROM flashcards WHERE category = ?);";
+
+        try (PreparedStatement stmt = CONNECTION.prepareStatement(sql)) {
+            stmt.setString(1, newUserID);
+            stmt.setString(2, cardID);
+            stmt.setString(3, category);
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            LOGGER.debug("Error while copying category: ", e);
+        }
     }
 
     private void executeStatement(Object value, String sql) {

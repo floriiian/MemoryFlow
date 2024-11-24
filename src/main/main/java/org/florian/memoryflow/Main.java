@@ -57,12 +57,15 @@ public class Main {
         app.post("/card_session/start", ctx -> handlePostRequest("/card_session/start", ctx));
         app.post("/card_session/solve", ctx -> handlePostRequest("/card_session/solve", ctx));
         app.post("/query/categories", ctx -> handlePostRequest("/query/categories", ctx));
+        app.post("/download/category", ctx -> handlePostRequest("/download/category", ctx));
 
         app.get("/get/userdata", ctx -> handleGetRequest("/get/userdata", ctx));
         app.get("/get/leaderboard", ctx -> handleGetRequest("/get/leaderboard", ctx));
         app.get("/get/daily_missions", ctx -> handleGetRequest("/get/daily_missions", ctx));
         app.get("/get/card_categories", ctx -> handleGetRequest("/get/card_categories", ctx));
         app.get("/get/card_session/end", ctx -> handleGetRequest("/get/card_session/end", ctx));
+        app.get("/auth", ctx -> handleGetRequest("/auth", ctx));
+        app.get("/logout", ctx -> handleGetRequest("/logout", ctx));
     }
 
     private static void handleGetRequest(String path, Context ctx) throws Exception {
@@ -89,6 +92,16 @@ public class Main {
                     break;
                 case "/get/card_session/end":
                     Redis.endFlashcardSession(ctx);
+                    break;
+                case "/auth":
+                    boolean validSession = verifySession(ctx);
+                    ctx.status(validSession ? 200 : 500);
+                    ctx.contentType("application/json");
+                    ctx.result(OBJECT_MAPPER.writeValueAsString(validSession));
+                    break;
+                case "/logout":
+                    handleLogoutRequest(ctx);
+                    break;
             }
         }
     }
@@ -131,10 +144,13 @@ public class Main {
             case "/query/categories":
                 Flashcards.queryFlashcardCategories(isValidSession, jsonData, ctx);
                 break;
+            case "/download/category":
+                Flashcards.duplicateFlashcardCategory(isValidSession, jsonData, ctx);
+                break;
         }
     }
 
-    private static boolean verifySession(Context ctx) {
+    public static boolean verifySession(Context ctx) {
         String accessToken = ctx.cookie("sessionToken");
         String refreshToken = ctx.cookie("refreshToken");
 
@@ -157,9 +173,10 @@ public class Main {
                 switch (requestType) {
                     case LOGIN:
                         Login.handleLoginRequest(ctx, OBJECT_MAPPER.treeToValue(jsonData, LoginRequest.class));
-                        return;
+                        break;
                     case REGISTER:
                         Register.handleRegisterRequest(ctx, OBJECT_MAPPER.treeToValue(jsonData, RegisterRequest.class));
+                        break;
                 }
             }
         } catch (Exception e) {
@@ -167,4 +184,18 @@ public class Main {
             ctx.status(500);
         }
     }
+    private static void handleLogoutRequest(Context ctx) {
+        boolean isValidSession = verifySession(ctx);
+
+        if (isValidSession) {
+            Database db = Database.getInstance();
+            try {
+                String user_id = Login.getAccountIDByToken(ctx.cookie("sessionToken"));
+                db.updateValues("accounts", "token", "user_id",user_id , "");
+            } catch (Exception _){}
+        }
+        ctx.removeCookie("sessionToken");
+        ctx.removeCookie("refreshToken");
+    }
+
 }
